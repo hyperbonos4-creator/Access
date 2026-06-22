@@ -52,6 +52,20 @@ class QdrantStore:
     def _collection(self, conjunto_id: str) -> str:
         return f"{self._settings.qdrant_collection_prefix}{conjunto_id}"
 
+    @staticmethod
+    def _is_missing_collection(exc: Exception) -> bool:
+        """True si el error de Qdrant indica 'la colección no existe' (404).
+
+        Defensa ante una caché desincronizada: si una colección se elimina por
+        fuera del servicio (p. ej. directamente en Qdrant), el cache local
+        `_known_collections` puede quedar obsoleto. Detectamos ese 404 para
+        autocurarnos (recrear/ignorar) en vez de propagar un 500.
+        """
+        if getattr(exc, "status_code", None) == 404:
+            return True
+        msg = str(exc).lower()
+        return "doesn't exist" in msg or "not found" in msg
+
     def _ensure_collection(self, conjunto_id: str) -> str:
         """Crea la colección del conjunto si no existe (coseno, dim configurada)."""
         from qdrant_client.models import Distance, VectorParams
@@ -81,16 +95,24 @@ class QdrantStore:
         client = self._ensure_client()
         name = self._ensure_collection(conjunto_id)
         point_id = str(uuid.uuid4())
-        client.upsert(
-            collection_name=name,
-            points=[
-                PointStruct(
-                    id=point_id,
-                    vector=embedding.tolist(),
-                    payload={"subject_id": subject_id},
-                )
-            ],
+        point = PointStruct(
+            id=point_id,
+            vector=embedding.tolist(),
+            payload={"subject_id": subject_id},
         )
+        try:
+            client.upsert(collection_name=name, points=[point])
+        except Exception as exc:  # noqa: BLE001
+            if not self._is_missing_collection(exc):
+                raise
+            # Caché desincronizada (la colección se borró por fuera): la
+            # invalidamos, la recreamos y reintentamos una sola vez.
+            logger.warning(
+                "Colección %s ausente al enrolar; recreando y reintentando.", name
+            )
+            self._known_collections.discard(name)
+            name = self._ensure_collection(conjunto_id)
+            client.upsert(collection_name=name, points=[point])
         return point_id
 
     # ── Borrado (Req 3.2, 3.5) ─────────────────────────────────────────────
@@ -146,9 +168,21 @@ class QdrantStore:
             if not client.collection_exists(name):
                 return []
             self._known_collections.add(name)
-        hits = client.search(
-            collection_name=name, query_vector=embedding.tolist(), limit=limit
-        )
+        try:
+            hits = client.search(
+                collection_name=name, query_vector=embedding.tolist(), limit=limit
+            )
+        except Exception as exc:  # noqa: BLE001
+            if not self._is_missing_collection(exc):
+                raise
+            # La colección se borró por fuera y el cache estaba obsoleto: no hay
+            # plantillas que coincidir → 1:N vacío (en vez de propagar un 500).
+            logger.warning(
+                "Colección %s ausente al buscar; cache invalidado, 0 coincidencias.",
+                name,
+            )
+            self._known_collections.discard(name)
+            return []
         return [(h.payload.get("subject_id", "unknown"), float(h.score)) for h in hits]
 
     # ── Salud ──────────────────────────────────────────────────────────────
