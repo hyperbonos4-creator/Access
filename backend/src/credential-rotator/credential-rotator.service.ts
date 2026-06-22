@@ -189,8 +189,11 @@ export class CredentialRotatorService {
     }
   }
 
-  /** ¿Este error justifica rotar de cuenta? (límite/cuota/auth/5xx proveedor). */
+  /** ¿Este error justifica rotar de cuenta? (límite/cuota/auth/5xx o timeout). */
   private isRotatable(error: any): boolean {
+    // Errores transitorios marcados explícitamente (timeout / canal caído):
+    // una cuenta puede colgarse sin devolver código HTTP.
+    if (error?.rotatable === true) return true;
     const status: number | undefined = error?.status ?? error?.response?.status;
     if (status == null) return false;
     return ROTATABLE_STATUS.has(status) || status >= 500;

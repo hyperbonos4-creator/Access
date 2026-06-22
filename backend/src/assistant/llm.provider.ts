@@ -112,8 +112,13 @@ export class LlmProvider {
       });
     } catch (e) {
       const err = e as { name?: string };
-      if (err?.name === 'AbortError') throw new Error('assistant_timeout');
-      throw new Error('assistant_unreachable');
+      // Timeout o canal caído: marcar como ROTABLE para que el rotador pruebe
+      // la siguiente cuenta (una cuenta puede colgarse sin devolver status).
+      const rerr: Error & { rotatable?: boolean } = new Error(
+        err?.name === 'AbortError' ? 'assistant_timeout' : 'assistant_unreachable',
+      );
+      rerr.rotatable = true;
+      throw rerr;
     } finally {
       clearTimeout(timer);
     }
