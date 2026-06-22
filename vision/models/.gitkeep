@@ -1,0 +1,3 @@
+# Los pesos ONNX (buffalo_l de InsightFace, MiniFASNet, fast-alpr) NO se versionan
+# en git. Se descargan en el primer uso (insightface) o en el build/deploy.
+# Este archivo solo preserva el directorio. Ver README §Modelos.

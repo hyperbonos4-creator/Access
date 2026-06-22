@@ -1,0 +1,13 @@
+﻿NAMES            IMAGE                               PORTS
+urban_backend    urban-backend                       0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+urban_web        urban-web                           0.0.0.0:3001->3001/tcp, [::]:3001->3001/tcp
+urban_nginx      nginx:1.25-alpine                   0.0.0.0:80->80/tcp, [::]:80->80/tcp
+urban_go2rtc     alexxit/go2rtc:latest               8554/tcp, 0.0.0.0:8555->8555/tcp, 0.0.0.0:8555->8555/udp, [::]:8555->8555/tcp, [::]:8555->8555/udp, 0.0.0.0:8984->1984/tcp, [::]:8984->1984/tcp
+urban_postgres   postgres:15-alpine                  0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+urban_redis      redis:7-alpine                      0.0.0.0:6480->6379/tcp, [::]:6480->6379/tcp
+urban_mediamtx   bluenviron/mediamtx:latest-ffmpeg   0.0.0.0:8554->8554/tcp, [::]:8554->8554/tcp, 0.0.0.0:8888-8889->8888-8889/tcp, [::]:8888-8889->8888-8889/tcp
+urban_minio      minio/minio:latest                  0.0.0.0:9000-9001->9000-9001/tcp, [::]:9000-9001->9000-9001/tcp
+urban_livekit    livekit/livekit-server:latest       0.0.0.0:7880-7881->7880-7881/tcp, [::]:7880-7881->7880-7881/tcp, 0.0.0.0:7882->7882/udp, [::]:7882->7882/udp
+---80/443---
+LISTEN 0      4096         0.0.0.0:80        0.0.0.0:*    users:(("docker-proxy",pid=325890,fd=8))                 
+LISTEN 0      4096            [::]:80           [::]:*    users:(("docker-proxy",pid=325896,fd=8))                 

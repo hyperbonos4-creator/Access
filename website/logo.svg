@@ -1,0 +1,23 @@
+<svg width="380" height="96" viewBox="0 0 380 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VisionYX">
+  <defs>
+    <linearGradient id="g-la" x1="14" y1="20" x2="40" y2="76" gradientUnits="userSpaceOnUse"><stop stop-color="#7ef0e0"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+    <linearGradient id="g-lb" x1="28" y1="20" x2="40" y2="76" gradientUnits="userSpaceOnUse"><stop stop-color="#1f9fd4"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+    <linearGradient id="g-rb" x1="52" y1="20" x2="40" y2="76" gradientUnits="userSpaceOnUse"><stop stop-color="#3b4fd6"/><stop offset="1" stop-color="#4f46e5"/></linearGradient>
+    <linearGradient id="g-ra" x1="66" y1="20" x2="40" y2="76" gradientUnits="userSpaceOnUse"><stop stop-color="#a855f7"/><stop offset="1" stop-color="#7c5cf6"/></linearGradient>
+    <linearGradient id="g-yx" x1="250" y1="34" x2="334" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#22d3ee"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+    <filter id="g-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <!-- faceted V mark -->
+  <g filter="url(#g-glow)">
+    <path d="M14 20 L28 20 L40 76 Z" fill="url(#g-la)"/>
+    <path d="M28 20 L40 50 L40 76 Z" fill="url(#g-lb)"/>
+    <path d="M52 20 L40 50 L40 76 Z" fill="url(#g-rb)"/>
+    <path d="M66 20 L52 20 L40 76 Z" fill="url(#g-ra)"/>
+  </g>
+  <path d="M28 20 L40 76 M52 20 L40 76" stroke="#eafcff" stroke-width="0.7" opacity="0.4"/>
+
+  <!-- wordmark -->
+  <text x="92" y="52" font-family="Orbitron, 'Segoe UI', Arial, sans-serif" font-size="32" font-weight="800" letter-spacing="2.5" fill="#eaf1fb">VISION<tspan fill="url(#g-yx)">YX</tspan></text>
+  <text x="93" y="71" font-family="'Exo 2', 'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" letter-spacing="3.4" fill="#7f93b8">INTELIGENCIA QUE CONECTA EL MUNDO REAL</text>
+</svg>

@@ -1,0 +1,33 @@
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Build
+dist/
+**/dist/
+
+# Entorno / secretos
+.env
+**/.env
+!**/.env.example
+**/.brain.env
+
+# Credenciales: tokens Cloudflare en texto plano (NUNCA subir)
+cuentas/
+
+# Ajustes locales del IDE/agente (pueden contener credenciales de cámara)
+.claude/
+
+# Python (vision)
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+*.pyc
+
+# Modelos ONNX (pesados; se montan/descargan)
+vision/models/*
+!vision/models/.gitkeep
+
+# Logs
+*.log

@@ -1,0 +1,119 @@
+# Office Access Control — stack completo de una puerta.
+#
+#   Postgres (dominio)  +  Qdrant (vectores)  +  vision (FastAPI/ONNX)  +  backend (NestJS)
+#
+# Uso:
+#   cp backend/.env.example backend/.env     # ajustar secretos
+#   cp vision/.env.example   vision/.env      # ajustar VISION_SERVICE_TOKEN, provider
+#   docker compose up -d --build
+#   docker compose run --rm backend npm run seed   # crea el admin inicial
+#
+# Nada se expone a internet salvo el backend (3000). Qdrant/Postgres/vision
+# viven en la red interna `office_net`.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: office_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-access}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-access}
+      POSTGRES_DB: ${DB_NAME:-access_control}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-access}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - office_net
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    container_name: office_qdrant
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "127.0.0.1:6335:6333"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - office_net
+
+  vision:
+    build:
+      context: ./vision
+      dockerfile: Dockerfile
+    image: office/vision-service:0.1.0
+    container_name: office_vision
+    restart: unless-stopped
+    env_file:
+      - ./vision/.env
+    environment:
+      VISION_QDRANT_URL: http://qdrant:6333
+    ports:
+      - "127.0.0.1:8210:8200"
+    volumes:
+      - vision_models:/models
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    networks:
+      - office_net
+    # ── GPU NVIDIA (producción): ver vision/README.md §GPU ──────────────
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: office/access-backend:0.1.0
+    container_name: office_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_SYNCHRONIZE: "true"
+      VISION_SERVICE_URL: http://vision:8200
+      CUENTAS_PATH: /app/cuentas/cuentas.json
+    ports:
+      - "3010:3000"
+    volumes:
+      # UI estática montada para iterar sin reconstruir la imagen.
+      - ./backend/public:/app/public:ro
+      # Credenciales del rotador (tokens) montadas, no horneadas en la imagen.
+      - ./cuentas:/app/cuentas:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      vision:
+        condition: service_started
+    networks:
+      - office_net
+
+volumes:
+  pg_data:
+  qdrant_data:
+  vision_models:
+
+networks:
+  office_net:
+    driver: bridge

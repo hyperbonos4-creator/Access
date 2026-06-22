@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cerebro VisionYX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--cy:#22d3ee;--bl:#3b82f6;--vi:#a855f7;--bg:#070b16;--pan:#0f1a30;--txt:#eaf1fb;--mut:#a6b6d4;--bd:rgba(120,160,220,.16)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Exo 2",system-ui,sans-serif;background:var(--bg);color:var(--txt);height:100vh;display:flex;flex-direction:column}
+    header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--bd);background:linear-gradient(120deg,rgba(34,211,238,.12),rgba(168,85,247,.14))}
+    .av{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cy),var(--vi));color:#04121a;font-family:"Orbitron";font-weight:800}
+    header h1{font-family:"Orbitron";font-size:1.05rem;letter-spacing:.5px}
+    header p{font-size:.76rem;color:var(--mut)}
+    #chat{flex:1;overflow-y:auto;padding:24px;max-width:900px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+    .msg{padding:14px 18px;border-radius:14px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word}
+    .user{align-self:flex-end;max-width:80%;background:linear-gradient(120deg,var(--cy),var(--bl));color:#04121a;font-weight:600;border-bottom-right-radius:4px}
+    .bot{align-self:flex-start;max-width:92%;background:var(--pan);border:1px solid var(--bd);border-bottom-left-radius:4px}
+    .bot code{background:rgba(34,211,238,.12);padding:1px 6px;border-radius:5px;font-family:ui-monospace,monospace;font-size:.9em;color:#bdf3ff}
+    .bot pre{background:#060c1a;border:1px solid var(--bd);border-radius:10px;padding:12px;overflow-x:auto;margin:10px 0}
+    .bot pre code{background:none;padding:0}
+    .sources{align-self:flex-start;max-width:92%;font-size:.78rem;color:var(--mut);display:flex;flex-wrap:wrap;gap:6px;margin-top:-8px}
+    .src{border:1px solid var(--bd);border-radius:999px;padding:4px 10px;font-family:ui-monospace,monospace}
+    .typing{align-self:flex-start;display:flex;gap:5px;padding:14px}
+    .typing i{width:8px;height:8px;border-radius:50%;background:var(--mut);animation:b 1.2s infinite}
+    .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+    @keyframes b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+    footer{border-top:1px solid var(--bd);padding:14px;background:var(--pan)}
+    .bar{max-width:900px;margin:0 auto;display:flex;gap:10px}
+    textarea{flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;color:var(--txt);font-family:inherit;font-size:.98rem;resize:none;max-height:140px;outline:none}
+    textarea:focus{border-color:var(--cy)}
+    button{flex:none;padding:0 22px;border:0;border-radius:12px;cursor:pointer;color:#04121a;font-weight:700;background:linear-gradient(120deg,var(--cy),var(--bl))}
+    button:disabled{opacity:.5}
+    .hint{max-width:900px;margin:8px auto 0;font-size:.72rem;color:var(--mut);text-align:center}
+    /* Botón y panel de Uso */
+    #uso-btn{margin-left:auto;background:rgba(34,211,238,.1);border:1px solid var(--bd);color:var(--txt);font-family:inherit;font-weight:600;font-size:.82rem;padding:8px 14px;border-radius:999px;cursor:pointer;transition:border-color .2s,background .2s}
+    #uso-btn:hover{border-color:var(--cy);background:rgba(34,211,238,.18)}
+    #uso-panel{position:fixed;inset:0;z-index:50;background:rgba(2,5,14,.72);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:18px}
+    #uso-panel.uso-hidden{display:none}
+    .uso-card{width:100%;max-width:480px;background:var(--pan);border:1px solid var(--bd);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden}
+    .uso-top{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd);background:linear-gradient(120deg,rgba(34,211,238,.12),rgba(168,85,247,.14))}
+    .uso-top b{font-family:"Orbitron";font-size:1rem}
+    #uso-x{background:none;border:0;color:var(--mut);font-size:1.5rem;cursor:pointer;line-height:1}
+    #uso-body{padding:20px}
+    .uso-load{color:var(--mut);text-align:center;padding:20px}
+    .gauge{height:14px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin:6px 0 4px}
+    .gauge>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cy),var(--bl));transition:width .5s}
+    .gauge.warn>i{background:linear-gradient(90deg,#ffb347,#ff7b54)}
+    .gauge.crit>i{background:linear-gradient(90deg,#ff8a5b,#ff5470)}
+    .uso-row{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem}
+    .uso-row b{font-family:"Orbitron";font-size:1.05rem}
+    .uso-sub{color:var(--mut);font-size:.78rem;margin-top:2px}
+    .uso-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+    .uso-stat{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}
+    .uso-stat .n{font-family:"Orbitron";font-size:1.25rem;color:var(--txt)}
+    .uso-stat .l{font-size:.72rem;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+    .uso-reset{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-top:6px}
+    .uso-reset .clk{font-family:ui-monospace,monospace;font-weight:700;color:var(--cy);font-size:1.1rem}
+    .uso-badge{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:999px}
+    .uso-ok{background:rgba(40,224,160,.15);color:#28e0a0}
+    .uso-bad{background:rgba(255,84,112,.15);color:#ff5470}
+    .uso-hist{margin-top:16px}
+    .uso-hist h4{font-size:.78rem;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+    .uso-bars{display:flex;align-items:flex-end;gap:6px;height:60px}
+    .uso-bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+    .uso-bars .bar{width:100%;background:linear-gradient(180deg,var(--cy),var(--bl));border-radius:4px 4px 0 0;min-height:2px}
+    .uso-bars .d{font-size:.6rem;color:var(--mut)}
+    .uso-note{font-size:.7rem;color:var(--mut);margin-top:14px;line-height:1.4}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="av">🧠</div>
+    <div><h1>Cerebro VisionYX</h1><p>Conoce todos tus proyectos · privado y local</p></div>
+    <button id="uso-btn" title="Uso de tokens / cuota">📊 Uso</button>
+  </header>
+  <div id="uso-panel" class="uso-hidden">
+    <div class="uso-card">
+      <div class="uso-top"><b>Uso de hoy</b><button id="uso-x">×</button></div>
+      <div id="uso-body"><div class="uso-load">Cargando…</div></div>
+    </div>
+  </div>
+  <div id="chat"></div>
+  <footer>
+    <div class="bar">
+      <textarea id="q" rows="1" placeholder="Escribe tu pregunta…"></textarea>
+      <button id="send">Preguntar</button>
+    </div>
+    <div class="hint">GLM-5.2 · responde solo lo que preguntas. Privado y local.</div>
+  </footer>
+  <script>
+    var chat = document.getElementById('q'), send = document.getElementById('send'), box = document.getElementById('chat');
+    var convo = [], busy = false;
+    function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+    function md(s){
+      s = esc(s);
+      s = s.replace(/```([\s\S]*?)```/g,function(_,c){return '<pre><code>'+c.trim()+'</code></pre>';});
+      s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+      s = s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+      return s;
+    }
+    function add(text, who){var d=document.createElement('div');d.className='msg '+who;d.innerHTML=who==='bot'?md(text):esc(text);box.appendChild(d);box.scrollTop=box.scrollHeight;return d;}
+    function addSources(srcs){if(!srcs||!srcs.length)return;var d=document.createElement('div');d.className='sources';d.innerHTML=srcs.map(function(s){return '<span class="src">'+esc(s.file)+':'+s.range+'</span>';}).join('');box.appendChild(d);box.scrollTop=box.scrollHeight;}
+    function typing(){var d=document.createElement('div');d.className='typing';d.id='t';d.innerHTML='<i></i><i></i><i></i>';box.appendChild(d);box.scrollTop=box.scrollHeight;}
+    function untyping(){var t=document.getElementById('t');if(t)t.remove();}
+    add('Hola 👋 Soy tu cerebro técnico. Tengo indexados tus proyectos. Pregúntame por arquitectura, dónde está algo, cómo funciona X, o pídeme comparar o mejorar código.','bot');
+    function ask(){
+      var q=chat.value.trim(); if(!q||busy)return; busy=true; send.disabled=true;
+      add(q,'user'); convo.push({role:'user',content:q}); chat.value=''; chat.style.height='auto'; typing();
+      doFetch(q,false);
+    }
+    function doFetch(q, retried){
+      fetch('/ask',{method:'POST',headers:{'Content-Type':'application/json','x-brain-token':localStorage.getItem('vxbrain_key')||''},body:JSON.stringify({question:q,history:convo})})
+        .then(function(r){
+          if(r.status===401){
+            if(retried){throw new Error('Clave incorrecta.');}
+            var k=prompt('Clave de acceso del Cerebro:'); if(k){localStorage.setItem('vxbrain_key',k); return doFetch(q,true);} 
+            throw new Error('Se requiere clave de acceso.');
+          }
+          return r.json();
+        })
+        .then(function(d){ if(!d) return; untyping(); if(d.error){add('⚠ '+d.error,'bot');return;} add(d.answer,'bot'); convo.push({role:'assistant',content:d.answer});})
+        .catch(function(e){untyping(); add('⚠ Error: '+e.message,'bot');})
+        .finally(function(){busy=false;send.disabled=false;chat.focus();});
+    }
+    send.onclick=ask;
+    chat.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();}});
+    chat.addEventListener('input',function(){chat.style.height='auto';chat.style.height=Math.min(140,chat.scrollHeight)+'px';});
+
+    // ── Panel de Uso ──────────────────────────────────────────────────
+    var usoTimer=null, resetAt=0;
+    function fmtDur(ms){var s=Math.max(0,Math.floor(ms/1000));var h=Math.floor(s/3600);s-=h*3600;var m=Math.floor(s/60);s-=m*60;function p(n){return (n<10?'0':'')+n;}return p(h)+':'+p(m)+':'+p(s);}
+    function nf(n){return (n||0).toLocaleString('es-CO');}
+    function renderUso(d){
+      var t=d.today, pct=t.pctEst, cls=pct>=90?'crit':pct>=70?'warn':'';
+      var estado=t.exhausted?'<span class="uso-badge uso-bad">CUOTA AGOTADA</span>':'<span class="uso-badge uso-ok">OPERATIVO</span>';
+      resetAt=new Date(d.resetAt).getTime();
+      var bars=d.history.map(function(h){var max=Math.max.apply(null,d.history.map(function(x){return x.neurons;}).concat([1]));var ht=Math.round((h.neurons/max)*52);return '<div class="b"><div class="bar" style="height:'+ht+'px" title="'+nf(h.neurons)+' neurons"></div><div class="d">'+h.day.slice(5)+'</div></div>';}).join('');
+      document.getElementById('uso-body').innerHTML=
+        '<div class="uso-row"><span>Cuota diaria gratis (estimado) '+estado+'</span><b>'+pct+'%</b></div>'+
+        '<div class="gauge '+cls+'"><i style="width:'+pct+'%"></i></div>'+
+        '<div class="uso-sub">≈ '+nf(t.neuronsEst)+' / '+nf(d.freeNeuronsPerDay)+' neurons · quedan ≈ '+nf(t.remainingEst)+'</div>'+
+        '<div class="uso-grid">'+
+          '<div class="uso-stat"><div class="n">'+nf(t.chatCalls)+'</div><div class="l">Consultas hoy</div></div>'+
+          '<div class="uso-stat"><div class="n">'+nf(t.tokens)+'</div><div class="l">Tokens de chat</div></div>'+
+          '<div class="uso-stat"><div class="n">'+nf(t.embedItems)+'</div><div class="l">Fragmentos embebidos</div></div>'+
+          '<div class="uso-stat"><div class="n">'+nf(t.promptTokens)+'/'+nf(t.completionTokens)+'</div><div class="l">Tokens in / out</div></div>'+
+        '</div>'+
+        '<div class="uso-reset">⏱ <div><div class="uso-sub" style="margin:0">El límite se restablece en</div><div class="clk" id="uso-clk">--:--:--</div></div></div>'+
+        '<div class="uso-hist"><h4>Últimos 7 días (neurons est.)</h4><div class="uso-bars">'+(bars||'<span class="uso-sub">sin datos</span>')+'</div></div>'+
+        '<div class="uso-note">Cifras de neurons estimadas a partir del consumo medido por el cerebro (chat + embeddings). El número exacto está en el panel de Cloudflare → Workers AI. El plan gratis da 10.000 neurons/día y se reinicia a medianoche UTC.</div>';
+      if(usoTimer)clearInterval(usoTimer);
+      usoTimer=setInterval(function(){var c=document.getElementById('uso-clk');if(c)c.textContent=fmtDur(resetAt-Date.now());},1000);
+      var c=document.getElementById('uso-clk');if(c)c.textContent=fmtDur(resetAt-Date.now());
+    }
+    function openUso(){
+      document.getElementById('uso-panel').classList.remove('uso-hidden');
+      document.getElementById('uso-body').innerHTML='<div class="uso-load">Cargando…</div>';
+      fetch('/usage',{headers:{'x-brain-token':localStorage.getItem('vxbrain_key')||''}})
+        .then(function(r){return r.ok?r.json():Promise.reject(new Error(r.status===401?'Clave requerida':'Error '+r.status));})
+        .then(renderUso)
+        .catch(function(e){document.getElementById('uso-body').innerHTML='<div class="uso-load">'+e.message+'</div>';});
+    }
+    function closeUso(){document.getElementById('uso-panel').classList.add('uso-hidden');if(usoTimer){clearInterval(usoTimer);usoTimer=null;}}
+    document.getElementById('uso-btn').onclick=openUso;
+    document.getElementById('uso-x').onclick=closeUso;
+    document.getElementById('uso-panel').addEventListener('click',function(e){if(e.target.id==='uso-panel')closeUso();});
+  </script>
+</body>
+</html>

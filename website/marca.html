@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual de Marca — VisionYX</title>
+  <meta name="description" content="Manual de marca de VisionYX: logo, variantes, paleta de color, tipografía y normas de uso." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .mk-hero { padding: 80px 0 30px; }
+    .mk-hero h1 { font-size: clamp(2rem, 4.5vw, 3rem); }
+    .mk-hero p { color: var(--muted); max-width: 60ch; margin-top: 12px; }
+    .mk-sec { padding: 40px 0; border-top: 1px solid var(--border); }
+    .mk-sec h2 { font-size: 1.4rem; margin-bottom: 6px; }
+    .mk-sec .lead-sm { color: var(--muted); margin-bottom: 26px; max-width: 64ch; }
+    .mk-grid { display: grid; gap: 20px; }
+    .cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .logo-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 30px; display: grid; place-items: center; min-height: 150px; gap: 14px; }
+    .logo-card img { max-width: 78%; height: auto; }
+    .logo-card .tag { font-size: .78rem; color: var(--muted-2); text-transform: uppercase; letter-spacing: 1.5px; }
+    .bg-dark { background: var(--bg); }
+    .bg-panel { background: var(--panel); }
+    .bg-light { background: #f3f6fc; }
+    .bg-light .tag { color: #5b6b86; }
+    .bg-grad { background: linear-gradient(120deg, #0c1430, #1a1138); }
+    .swatch { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .swatch__color { height: 96px; }
+    .swatch__meta { padding: 12px 14px; font-size: .82rem; }
+    .swatch__meta strong { display: block; font-weight: 600; }
+    .swatch__meta span { color: var(--muted-2); font-family: monospace; }
+    .type-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; background: var(--panel); }
+    .type-card .big { font-size: 2.4rem; font-weight: 800; }
+    .type-orbitron { font-family: "Orbitron", sans-serif; }
+    .type-exo { font-family: "Exo 2", sans-serif; }
+    .type-card .meta { color: var(--muted); margin-top: 10px; font-size: .92rem; }
+    .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .rules ul { list-style: none; display: grid; gap: 10px; }
+    .rules li { display: flex; gap: 10px; color: var(--muted); font-size: .95rem; }
+    .rules .ok span { color: #22d3ee; } .rules .no span { color: #f472b6; }
+    .protect { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+    .protect__box { border: 1px dashed var(--border-strong); border-radius: 14px; padding: 26px; background: var(--panel); }
+    @media (max-width: 760px) {
+      .cols-2, .cols-3, .cols-4, .rules { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav__inner">
+      <a class="brand" href="index.html" aria-label="VisionYX inicio">
+        <img src="vx-mark.svg" alt="" height="36" width="36" />
+        <span class="brand__word">VISION<span class="brand__yx">YX</span></span>
+      </a>
+      <nav class="nav__links" aria-label="Principal">
+        <a href="index.html">← Volver al inicio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="mk-hero">
+      <p class="kicker">Identidad visual</p>
+      <h1>Manual de Marca</h1>
+      <p>Las reglas para usar la identidad de VisionYX de forma coherente y
+        profesional en cualquier medio: digital, impreso o una sola tinta.</p>
+    </section>
+
+    <!-- Logo principal -->
+    <section class="mk-sec">
+      <h2>Logo principal</h2>
+      <p class="lead-sm">El lockup horizontal es la versión preferente. Úsalo siempre que haya espacio suficiente.</p>
+      <div class="mk-grid cols-2">
+        <div class="logo-card bg-dark"><img src="brand/vx-horizontal-color.svg" alt="Logo horizontal" /><span class="tag">Horizontal · fondo oscuro</span></div>
+        <div class="logo-card bg-panel"><img src="brand/vx-stacked-color.svg" alt="Logo apilado" style="max-width:52%" /><span class="tag">Apilado · usos compactos</span></div>
+      </div>
+    </section>
+
+    <!-- Variantes -->
+    <section class="mk-sec">
+      <h2>Variantes</h2>
+      <p class="lead-sm">Elige la variante según el fondo. Nunca fuerces el color sobre fondos que reduzcan el contraste.</p>
+      <div class="mk-grid cols-4">
+        <div class="logo-card bg-dark"><img src="brand/vx-icon-color.svg" alt="" style="max-width:54%" /><span class="tag">Color</span></div>
+        <div class="logo-card bg-grad"><img src="brand/vx-icon-white.svg" alt="" style="max-width:54%" /><span class="tag">Mono blanco</span></div>
+        <div class="logo-card bg-light"><img src="brand/vx-icon-dark.svg" alt="" style="max-width:54%" /><span class="tag">Mono negro</span></div>
+        <div class="logo-card bg-light"><img src="brand/vx-horizontal-light.svg" alt="" /><span class="tag">Fondo claro</span></div>
+      </div>
+    </section>
+
+    <!-- Isotipo -->
+    <section class="mk-sec">
+      <h2>Isotipo / Favicon</h2>
+      <p class="lead-sm">El isotipo (la “V” facetada) funciona solo cuando el espacio es mínimo: favicon, app, avatar de redes o sello.</p>
+      <div class="mk-grid cols-4">
+        <div class="logo-card bg-dark"><img src="favicon.svg" alt="" style="max-width:64px" /><span class="tag">Favicon 64</span></div>
+        <div class="logo-card bg-dark"><img src="brand/vx-icon-color.svg" alt="" style="max-width:40px" /><span class="tag">32 px</span></div>
+        <div class="logo-card bg-dark"><img src="brand/vx-icon-color.svg" alt="" style="max-width:24px" /><span class="tag">24 px</span></div>
+        <div class="logo-card bg-dark"><img src="brand/vx-icon-color.svg" alt="" style="max-width:16px" /><span class="tag">16 px</span></div>
+      </div>
+    </section>
+
+    <!-- Paleta -->
+    <section class="mk-sec">
+      <h2>Paleta de color</h2>
+      <p class="lead-sm">El degradado de marca va de cian a violeta. Los neutros oscuros sostienen el contraste.</p>
+      <div class="mk-grid cols-4">
+        <div class="swatch"><div class="swatch__color" style="background:#22d3ee"></div><div class="swatch__meta"><strong>Cian</strong><span>#22D3EE</span></div></div>
+        <div class="swatch"><div class="swatch__color" style="background:#3b82f6"></div><div class="swatch__meta"><strong>Azul</strong><span>#3B82F6</span></div></div>
+        <div class="swatch"><div class="swatch__color" style="background:#6366f1"></div><div class="swatch__meta"><strong>Índigo</strong><span>#6366F1</span></div></div>
+        <div class="swatch"><div class="swatch__color" style="background:#a855f7"></div><div class="swatch__meta"><strong>Violeta</strong><span>#A855F7</span></div></div>
+      </div>
+      <div class="mk-grid cols-4" style="margin-top:20px">
+        <div class="swatch"><div class="swatch__color" style="background:#070b16"></div><div class="swatch__meta"><strong>Fondo</strong><span>#070B16</span></div></div>
+        <div class="swatch"><div class="swatch__color" style="background:#0f1a30"></div><div class="swatch__meta"><strong>Panel</strong><span>#0F1A30</span></div></div>
+        <div class="swatch"><div class="swatch__color" style="background:#eaf1fb"></div><div class="swatch__meta"><strong>Texto</strong><span>#EAF1FB</span></div></div>
+        <div class="swatch"><div class="swatch__color" style="background:#a6b6d4"></div><div class="swatch__meta"><strong>Tenue</strong><span>#A6B6D4</span></div></div>
+      </div>
+    </section>
+
+    <!-- Tipografía -->
+    <section class="mk-sec">
+      <h2>Tipografía</h2>
+      <p class="lead-sm">Orbitron para la marca y los titulares; Exo 2 para texto e interfaz.</p>
+      <div class="mk-grid cols-2">
+        <div class="type-card">
+          <div class="big type-orbitron">Orbitron</div>
+          <div class="type-orbitron" style="font-size:1.2rem;letter-spacing:2px">VISIONYX · 0123456789</div>
+          <p class="meta">Display / titulares / wordmark. Pesos 700–900.</p>
+        </div>
+        <div class="type-card">
+          <div class="big type-exo">Exo 2</div>
+          <div class="type-exo" style="font-size:1.05rem">Plataformas que conectan el mundo real.</div>
+          <p class="meta">Cuerpo de texto e interfaz. Pesos 400–700.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Área de protección -->
+    <section class="mk-sec">
+      <h2>Área de protección y tamaño mínimo</h2>
+      <p class="lead-sm">Deja alrededor del logo un margen libre igual a la altura de la “V”. Tamaño mínimo del isotipo: 16 px (digital) / 8 mm (impreso).</p>
+      <div class="protect">
+        <div class="protect__box"><img src="brand/vx-horizontal-color.svg" alt="" style="width:260px" /></div>
+        <ul class="rules" style="grid-template-columns:1fr">
+          <li class="ok"><span>◆</span> Respeta el área de protección en todos los lados.</li>
+          <li class="ok"><span>◆</span> Mantén la proporción original (no estirar).</li>
+          <li class="ok"><span>◆</span> Usa el isotipo solo cuando no quepa el lockup.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Usos -->
+    <section class="mk-sec">
+      <h2>Usos correctos e incorrectos</h2>
+      <div class="rules" style="margin-top:8px">
+        <div class="logo-card bg-panel" style="display:block;text-align:left;padding:24px">
+          <p style="color:#22d3ee;font-weight:700;margin-bottom:12px">✓ Hazlo</p>
+          <ul class="rules ok" style="grid-template-columns:1fr">
+            <li><span>◆</span> Usa las variantes provistas sin modificarlas.</li>
+            <li><span>◆</span> Usa color sobre fondos oscuros; mono negro sobre claros.</li>
+            <li><span>◆</span> Garantiza contraste y legibilidad.</li>
+          </ul>
+        </div>
+        <div class="logo-card bg-panel" style="display:block;text-align:left;padding:24px">
+          <p style="color:#f472b6;font-weight:700;margin-bottom:12px">✕ Evita</p>
+          <ul class="rules no" style="grid-template-columns:1fr">
+            <li><span>✕</span> Cambiar los colores o aplicar otros degradados.</li>
+            <li><span>✕</span> Deformar, rotar o añadir sombras/contornos.</li>
+            <li><span>✕</span> Colocarlo sobre fondos con poco contraste.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <!-- Descargas -->
+    <section class="mk-sec">
+      <h2>Descargas</h2>
+      <p class="lead-sm">Archivos listos para usar. SVG para web y diseño; PNG de alta resolución para impresos, documentos y redes.</p>
+      <div class="mk-grid cols-3">
+        <div class="logo-card bg-panel" style="display:block;text-align:left;padding:22px">
+          <p class="tag" style="margin-bottom:12px">Logo (lockup)</p>
+          <ul class="rules" style="grid-template-columns:1fr;gap:8px">
+            <li class="ok"><span>↓</span> <a href="brand/vx-horizontal-color.svg" download>SVG color (fondo oscuro)</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/vx-horizontal-light.svg" download>SVG fondo claro</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/logo-lockup-2400.png" download>PNG color 2400px</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/logo-lockup-light-2400.png" download>PNG fondo claro 2400px</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/logo-lockup-darkbg-2400.png" download>PNG sobre fondo oscuro</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/logo-stacked-2000.png" download>PNG apilado 2000px</a></li>
+          </ul>
+        </div>
+        <div class="logo-card bg-panel" style="display:block;text-align:left;padding:22px">
+          <p class="tag" style="margin-bottom:12px">Isotipo (V)</p>
+          <ul class="rules" style="grid-template-columns:1fr;gap:8px">
+            <li class="ok"><span>↓</span> <a href="brand/vx-icon-color.svg" download>SVG color</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/vx-icon-white.svg" download>SVG mono blanco</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/vx-icon-dark.svg" download>SVG mono negro</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/vx-app-icon.svg" download>SVG ícono app</a></li>
+          </ul>
+        </div>
+        <div class="logo-card bg-panel" style="display:block;text-align:left;padding:22px">
+          <p class="tag" style="margin-bottom:12px">Íconos / redes (PNG)</p>
+          <ul class="rules" style="grid-template-columns:1fr;gap:8px">
+            <li class="ok"><span>↓</span> <a href="brand/avatar-1024.png" download>Avatar 1024 (perfil)</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/icon-512.png" download>Ícono 512</a></li>
+            <li class="ok"><span>↓</span> <a href="brand/icon-192.png" download>Ícono 192</a></li>
+            <li class="ok"><span>↓</span> <a href="apple-touch-icon.png" download>Apple touch 180</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="index.html"><img src="vx-mark.svg" alt="" height="34" width="34" /><span class="brand__word">VISION<span class="brand__yx">YX</span></span></a>
+        <p>Plataformas que conectan el mundo físico con la inteligencia digital.</p>
+      </div>
+      <div class="footer__meta">
+        <span>© <span id="year"></span> VisionYX · Medellín, Antioquia, Colombia</span>
+        <a href="index.html">Volver al inicio</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

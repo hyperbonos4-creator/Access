@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>VISIONYX Access · Terminal de Acceso</title>
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/theme.css?v=3" />
+  <link rel="stylesheet" href="assets/kiosk.css?v=4" />
+</head>
+<body>
+  <!-- ── Barra superior ───────────────────────────────────────────────── -->
+  <header class="kiosk-top">
+    <div class="brand">
+      <img class="logo" src="assets/logo.svg" alt="VisionYX" />
+      <div class="wordmark"><b>VISION<span class="yx">YX</span></b><span>Access · Terminal</span></div>
+    </div>
+    <div class="row" style="gap:16px">
+      <div id="point-name" class="pill">— sin punto —</div>
+      <div id="conn" class="pill"><span class="dot"></span> Conectando…</div>
+      <button id="btn-settings" class="btn ghost sm" title="Ajustes">⚙</button>
+    </div>
+  </header>
+
+  <!-- ── Escenario principal ──────────────────────────────────────────── -->
+  <main class="kiosk-stage">
+    <section class="video-card card">
+      <div class="video-wrap">
+        <img id="preview" alt="cámara" />
+        <canvas id="overlay"></canvas>
+        <div id="scanline" class="scanline"></div>
+        <div id="video-empty" class="video-empty">
+          <div class="spinner"></div>
+          <p class="muted">Esperando señal de la cámara…</p>
+        </div>
+      </div>
+      <div class="video-foot">
+        <div id="live-spoof" class="pill">Liveness —</div>
+        <div class="faint" id="captured-at">—</div>
+      </div>
+    </section>
+
+    <!-- ── Panel de identidad / veredicto ─────────────────────────────── -->
+    <section id="verdict" class="verdict-card card state-idle">
+      <div class="verdict-halo"></div>
+      <div class="verdict-icon" id="verdict-icon">⌖</div>
+      <div class="verdict-title" id="verdict-title">Acérquese a la cámara</div>
+      <div class="verdict-sub" id="verdict-sub">El sistema reconocerá su rostro automáticamente</div>
+
+      <div id="identity" class="identity hidden">
+        <div class="avatar" id="avatar">—</div>
+        <div class="identity-info">
+          <div class="identity-name" id="subject-name">—</div>
+          <div class="identity-meta">
+            <span class="pill" id="subject-role">—</span>
+            <span class="faint" id="subject-code"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="scores">
+        <div class="score">
+          <div class="spread"><span class="muted">Coincidencia</span><b id="match-val">0%</b></div>
+          <div class="meter ok" id="match-meter"><i></i></div>
+          <div class="faint thresh" id="match-th">umbral —</div>
+        </div>
+        <div class="score">
+          <div class="spread"><span class="muted">Prueba de vida</span><b id="live-val">0%</b></div>
+          <div class="meter ok" id="live-meter"><i></i></div>
+          <div class="faint thresh" id="live-th">umbral —</div>
+        </div>
+      </div>
+
+      <div class="door-live" id="door-live">
+        <div class="door-visual state-closed" id="door-visual" aria-hidden="true">
+          <div class="door-frame">
+            <div class="door-leaf leaf-left" id="door-leaf-l"></div>
+            <div class="door-leaf leaf-right" id="door-leaf-r"></div>
+            <div class="door-seam"></div>
+          </div>
+        </div>
+        <div class="door-info">
+          <div id="door-state" class="door-state">🔒 Puerta cerrada</div>
+          <div id="door-sub" class="door-sub faint">En espera</div>
+          <div class="door-countbar"><i id="door-countbar"></i></div>
+        </div>
+      </div>
+
+      <div class="verdict-foot">
+        <div id="reason-pill" class="pill faint"></div>
+      </div>
+      <button id="btn-manual" class="btn danger hidden" style="margin-top:14px">Apertura manual (operador)</button>
+    </section>
+  </main>
+
+  <!-- ── Modal: sesión de kiosko ──────────────────────────────────────── -->
+  <div id="modal-login" class="modal-bg hidden">
+    <div class="modal card">
+      <div class="brand" style="justify-content:center;margin-bottom:18px">
+        <img class="logo" src="assets/logo.svg" alt="" style="width:56px;height:56px" />
+        <div class="wordmark"><b>VISION<span class="yx">YX</span></b><span>Access · Terminal</span></div>
+      </div>
+      <p class="muted center" style="margin-bottom:18px;text-align:center">
+        Inicie sesión con una cuenta de operador o administrador para activar esta terminal.
+      </p>
+      <label class="field"><span>Correo</span><input id="login-email" type="email" autocomplete="username" placeholder="operador@office.local" /></label>
+      <label class="field"><span>Contraseña</span><input id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••" /></label>
+      <button id="btn-login" class="btn" style="width:100%">Activar terminal</button>
+    </div>
+  </div>
+
+  <!-- ── Modal: ajustes / selección de punto ──────────────────────────── -->
+  <div id="modal-settings" class="modal-bg hidden">
+    <div class="modal card">
+      <div class="spread" style="margin-bottom:16px">
+        <h3>Ajustes de la terminal</h3>
+        <button id="btn-close-settings" class="btn ghost sm">✕</button>
+      </div>
+      <label class="field"><span>Punto de acceso</span><select id="sel-point"></select></label>
+      <div class="row" style="margin:10px 0 18px">
+        <label class="field" style="flex:1;margin:0">
+          <span>Intervalo de reconocimiento (ms)</span>
+          <input id="poll-ms" type="number" min="600" step="100" value="1500" />
+        </label>
+      </div>
+      <div class="row" style="gap:10px">
+        <button id="btn-save-settings" class="btn" style="flex:1">Guardar</button>
+        <button id="btn-logout" class="btn ghost">Cerrar sesión</button>
+      </div>
+      <p class="faint" style="margin-top:14px;text-align:center">
+        ¿Configurar cámaras, puntos y empleados? <a href="admin.html" style="color:var(--cyan)">Consola de administración →</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="assets/demo-banner.js?v=1"></script>
+  <script type="module" src="assets/kiosk.js?v=5"></script>
+</body>
+</html>

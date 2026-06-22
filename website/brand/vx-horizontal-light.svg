@@ -1,0 +1,17 @@
+<svg width="380" height="100" viewBox="0 0 380 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VisionYX">
+  <defs>
+    <linearGradient id="hl-la" x1="16" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#0891b2"/></linearGradient>
+    <linearGradient id="hl-lb" x1="34" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse"><stop stop-color="#2563eb"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
+    <linearGradient id="hl-rb" x1="66" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse"><stop stop-color="#4f46e5"/><stop offset="1" stop-color="#4338ca"/></linearGradient>
+    <linearGradient id="hl-ra" x1="84" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse"><stop stop-color="#9333ea"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <linearGradient id="hl-yx" x1="262" y1="36" x2="346" y2="62" gradientUnits="userSpaceOnUse"><stop stop-color="#0891b2"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+  </defs>
+  <g transform="translate(2 16) scale(0.7)">
+    <path d="M16 22 L34 22 L50 84 Z" fill="url(#hl-la)"/>
+    <path d="M34 22 L50 56 L50 84 Z" fill="url(#hl-lb)"/>
+    <path d="M66 22 L50 56 L50 84 Z" fill="url(#hl-rb)"/>
+    <path d="M84 22 L66 22 L50 84 Z" fill="url(#hl-ra)"/>
+  </g>
+  <text x="92" y="54" font-family="Orbitron, 'Segoe UI', Arial, sans-serif" font-size="33" font-weight="800" letter-spacing="2.5" fill="#0b1326">VISION<tspan fill="url(#hl-yx)">YX</tspan></text>
+  <text x="93" y="73" font-family="'Exo 2', 'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" letter-spacing="3.3" fill="#5b6b86">INTELIGENCIA QUE CONECTA EL MUNDO REAL</text>
+</svg>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VISIONYX Access · Consola de Administración</title>
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/theme.css?v=3" />
+  <link rel="stylesheet" href="assets/admin.css?v=3" />
+</head>
+<body>
+  <header class="admin-top">
+    <div class="brand">
+      <img class="logo" src="assets/logo.svg" alt="VisionYX" />
+      <div class="wordmark"><b>VISION<span class="yx">YX</span></b><span>Access · Administración</span></div>
+    </div>
+    <div class="row" style="gap:12px">
+      <a href="index.html" class="btn ghost sm">Terminal de kiosko →</a>
+      <span id="who" class="pill"></span>
+      <button id="btn-logout" class="btn ghost sm">Salir</button>
+    </div>
+  </header>
+
+  <div class="admin-shell">
+    <nav class="admin-nav card">
+      <button class="nav-item active" data-tab="cameras">📷 Cámaras</button>
+      <button class="nav-item" data-tab="points">🚪 Puntos de acceso</button>
+      <button class="nav-item" data-tab="subjects">👤 Empleados</button>
+      <button class="nav-item" data-tab="events">📋 Eventos</button>
+      <button class="nav-item" data-tab="system">🩺 Sistema</button>
+      <div class="nav-foot">
+        <div id="vision-health" class="pill">Vision —</div>
+      </div>
+    </nav>
+
+    <main class="admin-content">
+      <!-- Cámaras -->
+      <section id="tab-cameras" class="tab">
+        <div class="card pad" id="cam-onboard">
+          <h3>Conecta tu primera cámara</h3>
+          <p class="sub" style="margin:6px 0 18px">¿Cómo quieres capturar el rostro en la puerta? Para probar ahora mismo, usa la cámara de este dispositivo.</p>
+          <div class="cam-options">
+            <button class="cam-opt" id="cam-mode-device">
+              <span class="cam-opt__tag">Recomendado</span>
+              <span class="cam-opt__i">📱</span>
+              <b>Usar la cámara de este dispositivo</b>
+              <small>Webcam del PC o cámara del móvil. Ideal para probar en 2 minutos, sin configurar nada.</small>
+            </button>
+            <button class="cam-opt" id="cam-mode-ip">
+              <span class="cam-opt__i">📷</span>
+              <b>Cámara IP</b>
+              <small>Hikvision, Dahua u ONVIF instalada en tu red local.</small>
+            </button>
+            <button class="cam-opt" id="cam-mode-nvr">
+              <span class="cam-opt__i">🎥</span>
+              <b>Grabador NVR</b>
+              <small>Una cámara conectada a un NVR, identificada por canal.</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Resultado: cámara del dispositivo -->
+        <div class="card pad hidden" id="cam-device-done">
+          <h3>✅ Listo para probar</h3>
+          <p class="sub" style="margin:6px 0 16px">Usaremos la cámara de este dispositivo. Ahora registra un rostro y pruébalo en el kiosko.</p>
+          <div class="row" style="gap:10px;flex-wrap:wrap">
+            <button class="btn" id="cam-go-enroll">1 · Registrar un rostro</button>
+            <a class="btn ghost" href="/kiosk/" target="_blank" rel="noopener">2 · Abrir kiosko →</a>
+            <button class="btn ghost" id="cam-back-1">Volver</button>
+          </div>
+        </div>
+
+        <!-- Form técnico (IP / NVR), oculto hasta elegir -->
+        <div class="card pad hidden" id="cam-ip-form">
+          <div class="spread"><h3 id="cam-ip-title">Conectar cámara IP</h3><button class="btn ghost sm" id="cam-back-2">← Volver</button></div>
+          <div class="grid2" style="margin-top:12px">
+            <label class="field"><span>Nombre</span><input id="cam-name" placeholder="Puerta principal" /></label>
+            <label class="field"><span>Dirección RTSP (con usuario y clave) · <a id="cam-help-toggle" style="color:var(--cyan);cursor:pointer">¿Qué es esto?</a></span><input id="cam-rtsp" placeholder="rtsp://usuario:clave@192.168.1.64:554/Streaming/Channels/101" /></label>
+            <label class="field"><span>Clave externa (opcional)</span><input id="cam-key" placeholder="door-cam" /></label>
+            <label class="field" id="cam-nvr-field"><span>Canal NVR (0 = cámara directa)</span><input id="cam-nvr" type="number" min="0" value="0" /></label>
+          </div>
+          <div class="hidden" id="cam-help" style="background:rgba(34,211,238,.06);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:2px 0 14px;font-size:.85rem;color:var(--text-dim)">
+            La dirección RTSP es el enlace de video de tu cámara. Ejemplos:<br>
+            <b>Hikvision:</b> <code>rtsp://usuario:clave@IP:554/Streaming/Channels/101</code><br>
+            <b>Dahua:</b> <code>rtsp://usuario:clave@IP:554/cam/realmonitor?channel=1&amp;subtype=0</code><br>
+            Reemplaza <i>usuario</i>, <i>clave</i> e <i>IP</i> por los de tu cámara.
+          </div>
+          <button id="cam-create" class="btn">Guardar cámara</button>
+        </div>
+
+        <div id="cam-list" class="list"></div>
+      </section>
+
+      <!-- Puntos -->
+      <section id="tab-points" class="tab hidden">
+        <div class="card pad" id="pt-howto">
+          <h3>¿Cómo funciona un punto de acceso?</h3>
+          <div class="flow">
+            <span class="flow__n">📷<b>Cámara</b></span><span class="flow__a">→</span>
+            <span class="flow__n">🧠<b>Reconoce + vida</b></span><span class="flow__a">→</span>
+            <span class="flow__n">🎛<b>Controlador</b></span><span class="flow__a">→</span>
+            <span class="flow__n">🚪<b>Puerta</b></span>
+          </div>
+          <p class="sub" style="margin-top:8px">Une una cámara, la validación de identidad y el dispositivo que abre la puerta. No defines tecnología: defines una <b>política de identidad</b>.</p>
+        </div>
+
+        <div class="card pad">
+          <h3>Crear punto de acceso</h3>
+          <div class="grid2">
+            <label class="field"><span>Nombre</span><input id="pt-name" placeholder="Puerta principal" /></label>
+            <label class="field"><span>Tipo</span><select id="pt-type">
+              <option value="PEDESTRIAN">🚪 Puerta peatonal</option>
+              <option value="VEHICLE" disabled>🚗 Portón vehicular (próximamente)</option>
+            </select></label>
+            <label class="field"><span>Método de validación</span><select id="pt-method">
+              <option value="FACE">Reconocimiento facial + prueba de vida</option>
+              <option value="QR" disabled>+ Código QR (próximamente)</option>
+              <option value="DOC" disabled>Documento de identidad (próximamente)</option>
+              <option value="PLATE" disabled>Placa vehicular · LPR (próximamente)</option>
+              <option value="MIX" disabled>Mixto (próximamente)</option>
+            </select></label>
+            <label class="field"><span>Cámara</span><select id="pt-cam"></select></label>
+          </div>
+
+          <div class="field"><span>Nivel de seguridad</span>
+            <div class="seg" id="pt-level">
+              <button type="button" data-lvl="LOW">Bajo</button>
+              <button type="button" data-lvl="NORMAL" class="active">Normal</button>
+              <button type="button" data-lvl="HIGH">Alto</button>
+              <button type="button" data-lvl="MAX">Máximo</button>
+            </div>
+          </div>
+          <div class="consequences" id="pt-consequences"></div>
+
+          <div class="field" style="margin-top:6px"><span>Controlador de puerta</span><select id="pt-controller">
+            <option value="SIMULATED">Modo simulación (probar sin hardware)</option>
+            <option value="HTTP">Relé / ESP32 (HTTP)</option>
+            <option value="HIKVISION_ISAPI">Controlador Hikvision</option>
+            <option value="NONE">Sin controlador</option>
+          </select></div>
+          <label class="field hidden" id="pt-ref-field"><span>Dirección del controlador · <a id="pt-ref-help-toggle" style="color:var(--cyan);cursor:pointer">¿Qué es esto?</a></span><input id="pt-ref" placeholder="http://192.168.1.50/open?token=..." /></label>
+          <div class="hidden" id="pt-ref-help" style="background:rgba(34,211,238,.06);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:2px 0 12px;font-size:.85rem;color:var(--text-dim)">El controlador es el dispositivo que libera la cerradura al conceder el acceso. Ejemplo ESP32/relé: <code>http://IP-del-relé/open?token=tu-token</code>. En modo simulación no necesitas ninguno.</div>
+
+          <details class="adv" id="pt-adv">
+            <summary>⚙ Configuración avanzada</summary>
+            <div class="slider-row">
+              <div class="spread"><span>Coincidencia facial requerida</span><b id="pt-match-val">50%</b></div>
+              <input type="range" id="pt-match" min="20" max="95" value="50" />
+              <div class="slider-ends"><span>Más flexible</span><span>Más estricto</span></div>
+            </div>
+            <div class="slider-row">
+              <div class="spread"><span>Verificación de vida</span><b id="pt-live-val">60%</b></div>
+              <input type="range" id="pt-live" min="20" max="95" value="60" />
+              <div class="slider-ends"><span>Más flexible</span><span>Más estricto</span></div>
+            </div>
+          </details>
+
+          <button id="pt-create" class="btn" style="margin-top:14px">Crear punto de acceso</button>
+        </div>
+        <div id="pt-list" class="list"></div>
+      </section>
+
+      <!-- Empleados -->
+      <section id="tab-subjects" class="tab hidden">
+        <div class="card pad">
+          <h3>Incorporar identidad</h3>
+          <p class="sub" style="margin:4px 0 14px">Registra a una persona autorizada para interactuar con tus espacios. Después completas su consentimiento y su rostro.</p>
+          <div class="grid2">
+            <label class="field"><span>Nombre completo</span><input id="sub-name" placeholder="María Pérez" /></label>
+            <label class="field"><span>Tipo</span><select id="sub-kind"><option value="EMPLOYEE">Empleado</option><option value="CONTRACTOR">Contratista</option><option value="STAFF">Personal</option></select></label>
+            <label class="field"><span>Código de empleado (opcional)</span><input id="sub-code" placeholder="EMP-001" /></label>
+          </div>
+          <button id="sub-create" class="btn">Incorporar identidad</button>
+        </div>
+        <div class="spread" style="margin:18px 4px 10px"><b>Identidades incorporadas</b><button id="sub-refresh" class="btn ghost sm">Actualizar</button></div>
+        <div id="sub-list" class="list"></div>
+      </section>
+
+      <!-- Eventos -->
+      <section id="tab-events" class="tab hidden">
+        <div class="card pad spread">
+          <h3>Últimos eventos de acceso</h3>
+          <button id="ev-refresh" class="btn ghost sm">Actualizar</button>
+        </div>
+        <div id="ev-list" class="list"></div>
+      </section>
+
+      <!-- Sistema / diagnóstico -->
+      <section id="tab-system" class="tab hidden">
+        <div class="card pad spread">
+          <h3>Estado del sistema</h3>
+          <button id="sys-refresh" class="btn ghost sm">Actualizar</button>
+        </div>
+        <div id="sys-list" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Login -->
+  <div id="modal-login" class="modal-bg hidden">
+    <div class="modal card">
+      <div class="brand" style="justify-content:center;margin-bottom:18px">
+        <img class="logo" src="assets/logo.svg" alt="" style="width:56px;height:56px" />
+        <div class="wordmark"><b>VISION<span class="yx">YX</span></b><span>Access · Administración</span></div>
+      </div>
+      <label class="field"><span>Correo</span><input id="login-email" type="email" placeholder="admin@office.local" /></label>
+      <label class="field"><span>Contraseña</span><input id="login-pass" type="password" placeholder="••••••••" /></label>
+      <button id="btn-login" class="btn" style="width:100%">Ingresar</button>
+    </div>
+  </div>
+
+  <!-- Modal de enrolamiento -->
+  <div id="modal-enroll" class="modal-bg hidden">
+    <div class="modal card" style="max-width:520px">
+      <div class="spread" style="margin-bottom:14px"><h3 id="enroll-title">Enrolar rostro</h3><button id="enroll-close" class="btn ghost sm">✕</button></div>
+      <div class="enroll-preview"><video id="enroll-video" autoplay playsinline muted class="hidden"></video><img id="enroll-shot" class="hidden" alt="" /><div id="enroll-placeholder" class="center muted" style="height:100%">Captura desde la cámara de la puerta o sube una foto</div></div>
+      <label class="field" style="margin-top:14px"><span>Cámara de la puerta (punto de acceso)</span>
+        <div class="row" style="gap:10px">
+          <select id="enroll-point" style="flex:1"></select>
+          <button id="enroll-ipcap" class="btn" type="button">📷 Capturar</button>
+        </div>
+      </label>
+      <div class="row" style="gap:10px;margin-top:4px">
+        <button id="enroll-cam" class="btn ghost" style="flex:1" type="button">Webcam del navegador</button>
+        <button id="enroll-snap" class="btn ghost" style="flex:1" disabled type="button">Tomar webcam</button>
+        <label class="btn ghost" style="flex:1;text-align:center;cursor:pointer">Subir foto<input id="enroll-file" type="file" accept="image/*" class="hidden" /></label>
+      </div>
+      <button id="enroll-submit" class="btn" style="width:100%;margin-top:14px" disabled>Enrolar</button>
+      <p class="faint" style="margin-top:10px;text-align:center">Requiere consentimiento ACTIVE. Rostro frontal, bien iluminado, uno solo en cuadro.</p>
+    </div>
+  </div>
+
+  <script src="assets/demo-banner.js?v=1"></script>
+  <script type="module" src="assets/admin.js?v=5"></script>
+</body>
+</html>

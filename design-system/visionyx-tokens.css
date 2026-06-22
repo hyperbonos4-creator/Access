@@ -1,0 +1,58 @@
+/* ============================================================================
+   VisionYX · Design Tokens
+   Fuente única de verdad de la identidad. Consúmelo desde cualquier producto
+   (HTML, React, Next, MUI, Tailwind). Cambia un token aquí → cambian todos.
+   Prefijo --vx-* para evitar colisiones con los estilos de cada app.
+   ============================================================================ */
+:root {
+  /* ── Marca (degradado cian → azul → violeta) ───────────────────────────── */
+  --vx-cyan: #22d3ee;
+  --vx-blue: #3b82f6;
+  --vx-indigo: #6366f1;
+  --vx-violet: #a855f7;
+  --vx-grad: linear-gradient(120deg, var(--vx-cyan), var(--vx-blue) 55%, var(--vx-violet));
+  --vx-grad-yx: linear-gradient(120deg, var(--vx-cyan), var(--vx-violet));
+
+  /* ── Neutros (tema oscuro) ─────────────────────────────────────────────── */
+  --vx-bg: #070b16;
+  --vx-bg-alt: #0b1326;
+  --vx-panel: #0f1a30;
+  --vx-panel-2: #13213c;
+  --vx-surface: rgba(18, 30, 60, 0.55);
+
+  --vx-text: #eaf1fb;
+  --vx-muted: #a6b6d4;
+  --vx-faint: #7184a6;
+
+  --vx-border: rgba(120, 160, 220, 0.14);
+  --vx-border-strong: rgba(99, 178, 247, 0.4);
+
+  /* ── Estado ────────────────────────────────────────────────────────────── */
+  --vx-ok: #28e0a0;
+  --vx-danger: #ff5470;
+  --vx-warn: #ffc14d;
+
+  /* ── Tipografía ────────────────────────────────────────────────────────── */
+  --vx-font: "Exo 2", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --vx-font-display: "Orbitron", var(--vx-font);
+
+  /* ── Forma · sombra · movimiento ───────────────────────────────────────── */
+  --vx-radius: 16px;
+  --vx-radius-sm: 12px;
+  --vx-radius-pill: 999px;
+  --vx-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --vx-glow: 0 0 28px rgba(99, 102, 241, 0.35);
+  --vx-ease: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Para superficies sobre fondo claro (documentos, impresos, apps light) */
+.vx-on-light {
+  --vx-bg: #f3f6fc;
+  --vx-bg-alt: #e9eef8;
+  --vx-panel: #ffffff;
+  --vx-text: #0b1326;
+  --vx-muted: #475569;
+  --vx-faint: #64748b;
+  --vx-border: rgba(15, 26, 48, 0.12);
+  --vx-border-strong: rgba(59, 130, 246, 0.45);
+}

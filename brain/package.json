@@ -1,0 +1,11 @@
+{
+  "name": "vx-brain",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "VisionYX Brain — asistente local que conoce todos tus proyectos (RAG + GLM vía Cloudflare).",
+  "scripts": {
+    "index": "node index.mjs",
+    "start": "node server.mjs"
+  }
+}

@@ -1,0 +1,15 @@
+﻿activating
+---cert---
+---le?---
+ssh : grep: /etc/nginx/sites-available/cam.conf: No such file or directory
+En línea: 1 Carácter: 1
++ ssh -i $key ubuntu@157.137.230.190 "systemctl is-active nginx; echo ' ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (grep: /etc/ngin...le or directory:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+no LE cert
+---listen---
+LISTEN 0      128        127.0.0.1:8081      0.0.0.0:*    users:(("sshd",pid=2222978,fd=7))                        
+LISTEN 0      4096         0.0.0.0:80        0.0.0.0:*    users:(("docker-proxy",pid=325890,fd=8))                 
+LISTEN 0      4096            [::]:80           [::]:*    users:(("docker-proxy",pid=325896,fd=8))                 

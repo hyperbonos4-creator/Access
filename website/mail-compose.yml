@@ -1,0 +1,51 @@
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail.visionyx.lat
+    env_file: mailserver.env
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "143:143"
+      - "993:993"
+    volumes:
+      - ./dms/mail-data/:/var/mail/
+      - ./dms/mail-state/:/var/mail-state/
+      - ./dms/mail-logs/:/var/log/mail/
+      - ./dms/config/:/tmp/docker-mailserver/
+      - /etc/letsencrypt/:/etc/letsencrypt/:ro
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    stop_grace_period: 1m
+    cap_add:
+      - NET_ADMIN
+    networks:
+      mailnet:
+        aliases:
+          - mail.visionyx.lat
+
+  roundcube:
+    image: roundcube/roundcubemail:latest
+    container_name: roundcube
+    restart: unless-stopped
+    depends_on:
+      - mailserver
+    ports:
+      - "127.0.0.1:8086:80"
+    environment:
+      ROUNDCUBEMAIL_DEFAULT_HOST: "ssl://mail.visionyx.lat"
+      ROUNDCUBEMAIL_DEFAULT_PORT: "993"
+      ROUNDCUBEMAIL_SMTP_SERVER: "tls://mail.visionyx.lat"
+      ROUNDCUBEMAIL_SMTP_PORT: "587"
+      ROUNDCUBEMAIL_DB_TYPE: "sqlite"
+      ROUNDCUBEMAIL_PRODUCT_NAME: "Visionyx Webmail"
+    volumes:
+      - ./roundcube/db:/var/roundcube/db
+      - ./roundcube/config:/var/roundcube/config
+    networks:
+      - mailnet
+
+networks:
+  mailnet:

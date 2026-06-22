@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VISIONYX Access · Registro facial guiado</title>
+  <link rel="icon" href="assets/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/theme.css?v=3" />
+  <link rel="stylesheet" href="assets/enroll.css?v=5" />
+</head>
+<body>
+  <header class="enroll-top">
+    <div class="brand">
+      <img class="logo" src="assets/logo.svg" alt="VisionYX" />
+      <div class="wordmark"><b>VISION<span class="yx">YX</span></b><span>Access · Registro facial</span></div>
+    </div>
+    <div class="row" style="gap:14px">
+      <span class="who">Empleado: <b id="who-name">—</b></span>
+      <a href="admin.html" class="btn ghost sm">← Volver a administración</a>
+    </div>
+  </header>
+
+  <div class="enroll-shell">
+    <!-- Escenario de cámara -->
+    <section class="stage" id="stage">
+      <video id="video" autoplay playsinline muted class="view mirror hidden"></video>
+      <img id="ipview" class="view hidden" alt="" />
+      <canvas id="work" class="hidden"></canvas>
+
+      <div class="stage-status">
+        <span id="face-flag" class="face-flag">Inicializando…</span>
+        <span id="timer" class="face-flag countdown hidden"></span>
+      </div>
+
+      <div class="guide" id="guide">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+          <circle class="ring-bg" cx="50" cy="50" r="38" />
+          <circle class="ring-fg" id="ring" cx="50" cy="50" r="38"
+                  stroke-dasharray="238.76" stroke-dashoffset="238.76"
+                  transform="rotate(-90 50 50)" />
+        </svg>
+      </div>
+
+      <div class="cue" id="cue">
+        <span class="icon" id="cue-icon">⌖</span>
+        <div class="title" id="cue-title">Preparando cámara</div>
+        <div class="hint" id="cue-hint">Un momento…</div>
+      </div>
+    </section>
+
+    <!-- Panel lateral -->
+    <aside class="side">
+      <div class="card">
+        <h3>Prueba de vida activa</h3>
+        <div class="sub">Sigue las indicaciones en pantalla. El sistema verifica que eres una persona real (anti-foto) y captura tu rostro frontal.</div>
+        <div class="steps" id="steps"></div>
+      </div>
+
+      <div class="card" id="control-card">
+        <h3>Fuente de cámara</h3>
+        <div class="sub">Usa la webcam del dispositivo (recomendado) o la cámara IP de la puerta.</div>
+        <div class="source-row">
+          <button id="src-webcam" class="btn ghost sm">📷 Webcam</button>
+          <button id="src-ip" class="btn ghost sm">🚪 Cámara IP</button>
+        </div>
+        <label class="field hidden" id="ip-point-wrap" style="margin-top:12px">
+          <span>Punto de acceso (cámara IP)</span>
+          <select id="ip-point"></select>
+        </label>
+        <button id="btn-start" class="btn big-btn" style="margin-top:16px" disabled>Iniciar registro guiado</button>
+        <button id="btn-retry" class="btn ghost big-btn hidden" style="margin-top:10px">Reintentar</button>
+      </div>
+
+      <div class="card hidden" id="result-card">
+        <div class="result" id="result">
+          <h4 id="result-title"></h4>
+          <div class="detail" id="result-detail"></div>
+          <div class="scores hidden" id="result-scores">
+            <div class="s">Liveness pasivo<b id="score-passive">—</b></div>
+          </div>
+          <div class="result-actions hidden" id="result-actions"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="assets/demo-banner.js?v=1"></script>
+  <script type="module" src="assets/enroll.js?v=7"></script>
+</body>
+</html>

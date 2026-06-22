@@ -1,0 +1,108 @@
+/* ============================================================================
+   VisionYX · UI Kit  (componentes base)
+   Requiere visionyx-tokens.css y las fuentes Orbitron + Exo 2.
+   Clases con prefijo .vx-* para integrarse sin chocar con la app anfitriona.
+   ============================================================================ */
+
+/* ── Marca / wordmark ──────────────────────────────────────────────────────*/
+.vx-brand { display: inline-flex; align-items: center; gap: 11px; }
+.vx-brand__mark { display: block; height: 36px; width: auto; }
+.vx-brand__word {
+  font-family: var(--vx-font-display);
+  font-weight: 800; letter-spacing: 2px; color: var(--vx-text);
+  font-size: 1.2rem; line-height: 1;
+}
+.vx-brand__word .yx {
+  background: var(--vx-grad-yx);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.vx-brand--stack { flex-direction: column; gap: 4px; align-items: flex-start; }
+.vx-brand__sub { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--vx-faint); }
+
+/* ── Tipografía utilitaria ─────────────────────────────────────────────────*/
+.vx-display { font-family: var(--vx-font-display); font-weight: 800; letter-spacing: -0.2px; }
+.vx-accent { background: var(--vx-grad-yx); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.vx-kicker { color: var(--vx-cyan); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; }
+.vx-muted { color: var(--vx-muted); }
+.vx-faint { color: var(--vx-faint); }
+
+/* ── Botones ───────────────────────────────────────────────────────────────*/
+.vx-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--vx-font); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.2px;
+  padding: 12px 22px; border-radius: var(--vx-radius-pill); border: 0; cursor: pointer;
+  position: relative; overflow: hidden;
+  background: var(--vx-grad); color: #04121a;
+  transition: transform var(--vx-ease), box-shadow var(--vx-ease), filter var(--vx-ease);
+}
+.vx-btn::after {
+  content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: skewX(-18deg); transition: left 0.5s ease;
+}
+.vx-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(99,102,241,.4); }
+.vx-btn:hover::after { left: 130%; }
+.vx-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.3); }
+.vx-btn--ghost { background: rgba(255,255,255,0.03); color: var(--vx-text); border: 1px solid var(--vx-border-strong); }
+.vx-btn--ghost::after { display: none; }
+.vx-btn--ghost:hover { border-color: var(--vx-cyan); color: var(--vx-cyan); }
+.vx-btn--danger { background: linear-gradient(180deg, #ff5470, #d83456); color: #fff; }
+.vx-btn--sm { padding: 8px 14px; font-size: 0.88rem; }
+
+/* ── Tarjetas / superficies ────────────────────────────────────────────────*/
+.vx-card {
+  position: relative; background: linear-gradient(165deg, var(--vx-panel), var(--vx-bg-alt));
+  border: 1px solid var(--vx-border); border-radius: var(--vx-radius); padding: 26px;
+  transition: transform var(--vx-ease), border-color var(--vx-ease), box-shadow var(--vx-ease);
+}
+.vx-card--hover:hover { transform: translateY(-5px); border-color: var(--vx-border-strong); box-shadow: var(--vx-shadow); }
+.vx-card--accent::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--vx-grad); opacity: .7; border-radius: var(--vx-radius) var(--vx-radius) 0 0; }
+.vx-glass { background: var(--vx-surface); border: 1px solid var(--vx-border); border-radius: var(--vx-radius); backdrop-filter: blur(14px); box-shadow: var(--vx-shadow); }
+
+/* ── Ícono en relieve ──────────────────────────────────────────────────────*/
+.vx-icon {
+  display: inline-grid; place-items: center; width: 50px; height: 50px; border-radius: 14px;
+  background: linear-gradient(160deg, rgba(34,211,238,.20), rgba(168,85,247,.16));
+  border: 1px solid rgba(120,160,220,.24);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 6px 18px rgba(6,10,24,.5);
+  color: #bdf3ff; font-size: 1.4rem; text-shadow: 0 0 14px rgba(34,211,238,.5);
+}
+
+/* ── Inputs ────────────────────────────────────────────────────────────────*/
+.vx-field { display: grid; gap: 7px; margin-bottom: 14px; }
+.vx-field > span { font-size: 12px; color: var(--vx-muted); letter-spacing: 0.4px; }
+.vx-input, .vx-select, .vx-textarea {
+  width: 100%; font-family: var(--vx-font); font-size: 0.95rem; color: var(--vx-text);
+  background: rgba(4,10,24,0.6); border: 1px solid var(--vx-border); border-radius: var(--vx-radius-sm);
+  padding: 11px 13px; outline: none; transition: border-color var(--vx-ease), box-shadow var(--vx-ease);
+}
+.vx-input:focus, .vx-select:focus, .vx-textarea:focus { border-color: var(--vx-cyan); box-shadow: 0 0 0 3px rgba(34,211,238,.16); }
+
+/* ── Pills / badges ────────────────────────────────────────────────────────*/
+.vx-pill {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+  padding: 5px 12px; border-radius: var(--vx-radius-pill); border: 1px solid var(--vx-border);
+  color: var(--vx-muted); background: rgba(255,255,255,0.03);
+}
+.vx-pill--ok { color: var(--vx-ok); border-color: rgba(40,224,160,.45); }
+.vx-pill--danger { color: var(--vx-danger); border-color: rgba(255,84,112,.45); }
+.vx-pill--warn { color: var(--vx-warn); border-color: rgba(255,193,77,.4); }
+.vx-tag { font-size: 0.74rem; font-weight: 600; color: var(--vx-cyan); padding: 4px 11px; border: 1px solid var(--vx-border); border-radius: var(--vx-radius-pill); }
+
+/* ── Barra de progreso / meter ─────────────────────────────────────────────*/
+.vx-meter { height: 10px; border-radius: var(--vx-radius-pill); background: rgba(255,255,255,.06); overflow: hidden; }
+.vx-meter > i { display: block; height: 100%; width: 0; border-radius: var(--vx-radius-pill); background: var(--vx-grad); transition: width 0.4s ease; }
+
+/* ── Spinner ───────────────────────────────────────────────────────────────*/
+@keyframes vx-spin { to { transform: rotate(360deg); } }
+.vx-spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.2); border-top-color: var(--vx-cyan); animation: vx-spin 0.7s linear infinite; }
+
+/* ── Fondo de marca (rejilla + glow) reutilizable ──────────────────────────*/
+.vx-backdrop { position: relative; background:
+  radial-gradient(1100px 680px at 80% -10%, rgba(168,85,247,.16), transparent 60%),
+  radial-gradient(900px 600px at 6% 2%, rgba(34,211,238,.12), transparent 58%),
+  linear-gradient(180deg, var(--vx-bg-alt), var(--vx-bg)); }
+.vx-grid-bg::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: linear-gradient(rgba(120,160,220,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(120,160,220,.05) 1px, transparent 1px);
+  background-size: 46px 46px; -webkit-mask-image: radial-gradient(circle at 50% 40%, #000, transparent 80%); mask-image: radial-gradient(circle at 50% 40%, #000, transparent 80%); }

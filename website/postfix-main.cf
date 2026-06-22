@@ -1,0 +1,1 @@
+smtp_header_checks = pcre:/tmp/docker-mailserver/smtp-header-rewrite.pcre

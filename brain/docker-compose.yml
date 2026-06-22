@@ -1,0 +1,31 @@
+# Cerebro VisionYX — siempre disponible cuando arranca Docker.
+# Por ahora SOLO en loopback (127.0.0.1): seguro, sin exponer a internet.
+# El índice (data/) y la config se montan; re-indexar se hace en el host:
+#   node index.mjs   (regenera data/index.json; el contenedor lo recoge solo)
+services:
+  brain:
+    build: .
+    image: visionyx/brain:1.0.0
+    container_name: vx_brain
+    restart: unless-stopped
+    environment:
+      BRAIN_HOST: "0.0.0.0"
+      # Control total de archivos SOBRE la carpeta access (prueba autorizada).
+      ACCESS_ROOT: "/projects/access"
+      ALLOW_WRITE: "true"
+    env_file:
+      # La clave de acceso vive aquí (literal, sin que Compose toque el $).
+      # Este archivo está en .gitignore. Cámbiala cuando quieras.
+      - .brain.env
+    ports:
+      # Publicado SOLO en el loopback del PC. Para el móvil se hará por túnel
+      # seguro más adelante (no abrir a la LAN sin auth).
+      - "127.0.0.1:8799:8799"
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./data:/app/data:ro
+      # Medidor de uso (escritura): compartido con el indexador del host.
+      - ./runtime:/app/runtime
+      # Carpeta access montada en LECTURA-ESCRITURA: el cerebro puede leer,
+      # crear, editar y borrar dentro de access (y solo ahí).
+      - c:/Users/Hide/Desktop/access:/projects/access

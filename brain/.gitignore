@@ -1,0 +1,7 @@
+config.json
+.brain.env
+data/
+runtime/
+node_modules/
+*.log
+HOLA_CEREBRO.txt

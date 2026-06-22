@@ -1,0 +1,36 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VisionYX">
+  <defs>
+    <linearGradient id="m-la" x1="16" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7ef0e0"/><stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="m-lb" x1="34" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1f9fd4"/><stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="m-rb" x1="66" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3b4fd6"/><stop offset="1" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="m-ra" x1="84" y1="22" x2="50" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a855f7"/><stop offset="1" stop-color="#7c5cf6"/>
+    </linearGradient>
+    <filter id="m-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#m-glow)">
+    <!-- outer-left facet (lit) -->
+    <path d="M16 22 L34 22 L50 84 Z" fill="url(#m-la)"/>
+    <!-- inner-left facet (shadow) -->
+    <path d="M34 22 L50 56 L50 84 Z" fill="url(#m-lb)"/>
+    <!-- inner-right facet (shadow) -->
+    <path d="M66 22 L50 56 L50 84 Z" fill="url(#m-rb)"/>
+    <!-- outer-right facet (lit) -->
+    <path d="M84 22 L66 22 L50 84 Z" fill="url(#m-ra)"/>
+  </g>
+
+  <!-- crease highlights -->
+  <path d="M34 22 L50 84" stroke="#eafcff" stroke-width="0.9" opacity="0.45"/>
+  <path d="M66 22 L50 84" stroke="#eafcff" stroke-width="0.9" opacity="0.3"/>
+  <path d="M16 22 L50 84 L84 22" stroke="#eafcff" stroke-width="0.7" opacity="0.25" fill="none"/>
+</svg>
