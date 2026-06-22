@@ -13,64 +13,124 @@ export function loadConfig() {
   return cfg;
 }
 
-const CF = (cfg) => `https://api.cloudflare.com/client/v4/accounts/${cfg.cloudflare.accountId}`;
-const AUTH = (cfg) => ({ Authorization: `Bearer ${cfg.cloudflare.apiToken}`, 'Content-Type': 'application/json' });
+/**
+ * Pool de cuentas Cloudflare para rotación. Usa `cfg.cloudflare.accounts`
+ * (array de {accountId, apiToken}) si existe; si no, cae a la cuenta única
+ * `cfg.cloudflare.{accountId,apiToken}`. Permite agotar la cuota diaria gratis
+ * de una cuenta y seguir con la siguiente, en vez de bloquearse.
+ */
+function accountPool(cfg) {
+  const list = cfg?.cloudflare?.accounts;
+  if (Array.isArray(list) && list.length) {
+    return list
+      .map((a) => ({ accountId: a.accountId ?? a.account_id, apiToken: a.apiToken ?? a.token }))
+      .filter((a) => a.accountId && a.apiToken);
+  }
+  return [{ accountId: cfg.cloudflare.accountId, apiToken: cfg.cloudflare.apiToken }];
+}
 
-/** Embeddings (bge-m3). Devuelve un vector por texto. */
-export async function embed(cfg, texts) {
-  const url = `${CF(cfg)}/ai/run/${cfg.cloudflare.embedModel}`;
+// Índice de la cuenta activa (persistente en el proceso): al rotar avanza, así
+// la siguiente petición arranca en la última cuenta que funcionó. No se marca
+// "agotada" de forma permanente, de modo que tras el reinicio de cuota (UTC)
+// las cuentas vuelven a probarse solas.
+let _accountIdx = 0;
+
+/** Cuenta Cloudflare activa ahora mismo. */
+export function currentAccount(cfg) {
+  const pool = accountPool(cfg);
+  return pool[_accountIdx % pool.length];
+}
+
+// Códigos que justifican rotar de cuenta: cuota (429), pago/permiso (402/403)
+// o token inválido (401) — en todos esos casos esta cuenta no sirve ahora.
+const ROTATABLE = new Set([401, 402, 403, 429]);
+
+/**
+ * Ejecuta `fn(account)` rotando de cuenta ante un código rotable (cuota agotada,
+ * etc.). Reintenta hasta agotar el pool; solo entonces lanza "todas agotadas".
+ */
+async function withRotation(cfg, label, fn) {
+  const pool = accountPool(cfg);
+  for (let attempt = 0; attempt < pool.length; attempt++) {
+    const acc = pool[_accountIdx % pool.length];
+    try {
+      return await fn(acc);
+    } catch (e) {
+      if (!ROTATABLE.has(e?.status)) throw e;
+      console.warn(
+        `[rotacion] ${label}: cuenta ${acc.accountId} no disponible (HTTP ${e.status}, intento ${attempt + 1}/${pool.length}); rotando…`,
+      );
+      _accountIdx = (_accountIdx + 1) % pool.length;
+    }
+  }
+  throw new Error(
+    'Se agotó la cuota diaria gratis de Cloudflare en TODAS las cuentas del pool. ' +
+      'Espera al reinicio diario (UTC) o activa Workers Paid.',
+  );
+}
+
+/** fetch contra Cloudflare/OpenAI-compat que marca el 429 para que rote. */
+async function _fetchJson(url, apiToken, body, label) {
   const res = await fetch(url, {
     method: 'POST',
-    headers: AUTH(cfg),
-    body: JSON.stringify({ text: texts }),
+    headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(res.status === 429 ? 'Se agotó la cuota diaria gratis de Cloudflare en esta cuenta. Cambia de cuenta en config.json o activa Workers Paid.' : `embed HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const vecs = data?.result?.data;
-  if (!Array.isArray(vecs)) throw new Error('embed: respuesta inesperada');
-  return vecs;
+  if (!res.ok) {
+    const err = new Error(`${label} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    err.status = res.status; // permite a withRotation detectar el 429
+    throw err;
+  }
+  return res.json();
 }
 
-/** Proveedor de chat: usa cfg.chat si está; si no, cae a Cloudflare (GLM). */
-function chatProvider(cfg) {
-  if (cfg.chat && cfg.chat.baseUrl && cfg.chat.apiKey) return cfg.chat;
-  return {
-    baseUrl: `https://api.cloudflare.com/client/v4/accounts/${cfg.cloudflare.accountId}/ai/v1`,
-    apiKey: cfg.cloudflare.apiToken,
-    model: cfg.cloudflare.chatModel,
-    disableThinking: true,
-    tools: true,
-  };
+/** Embeddings (bge-m3). Devuelve un vector por texto. Rota de cuenta ante 429. */
+export async function embed(cfg, texts) {
+  return withRotation(cfg, 'embed', async (acc) => {
+    const url = `https://api.cloudflare.com/client/v4/accounts/${acc.accountId}/ai/run/${cfg.cloudflare.embedModel}`;
+    const data = await _fetchJson(url, acc.apiToken, { text: texts }, 'embed');
+    const vecs = data?.result?.data;
+    if (!Array.isArray(vecs)) throw new Error('embed: respuesta inesperada');
+    return vecs;
+  });
 }
 
-/** Chat (OpenAI-compat, agnóstico). Cloudflare GLM, Venice u otro: solo cambia cfg.chat. */
+/** Chat (OpenAI-compat). Cloudflare GLM rota de cuenta ante 429; un proveedor
+ * custom (`cfg.chat`) no rota (cuenta única por configuración). */
 export async function chat(cfg, messages, opts = {}) {
-  const p = chatProvider(cfg);
+  const custom = cfg.chat && cfg.chat.baseUrl && cfg.chat.apiKey ? cfg.chat : null;
+  const model = custom ? custom.model : cfg.cloudflare.chatModel;
+  const disableThinking = custom ? custom.disableThinking !== false : true;
+  const supportsTools = custom ? custom.tools !== false : true;
+
   const body = {
-    model: p.model,
+    model,
     messages,
     max_tokens: opts.maxTokens || cfg.maxTokens || 1200,
     temperature: 0.2,
     stream: false,
   };
-  // chat_template_kwargs es específico de GLM/Cloudflare; solo si el proveedor lo soporta.
-  if (p.disableThinking !== false) body.chat_template_kwargs = { enable_thinking: false };
-  // tools: function-calling. Desactívalo en proveedores/modelos que no lo soporten.
-  if (opts.tools && p.tools !== false) { body.tools = opts.tools; body.tool_choice = 'auto'; }
-  const res = await fetch(`${p.baseUrl.replace(/\/+$/, '')}/chat/completions`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${p.apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(res.status === 429 ? 'Se agotó la cuota diaria gratis de Cloudflare en esta cuenta. Cambia de cuenta en config.json o activa Workers Paid.' : `chat HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const msg = data?.choices?.[0]?.message || {};
-  const u = data?.usage || {};
-  return {
-    content: msg.content ? stripThinking(msg.content) : '',
-    tool_calls: msg.tool_calls || null,
-    usage: { prompt: Number(u.prompt_tokens || 0), completion: Number(u.completion_tokens || 0) },
+  if (disableThinking) body.chat_template_kwargs = { enable_thinking: false };
+  if (opts.tools && supportsTools) { body.tools = opts.tools; body.tool_choice = 'auto'; }
+
+  const parse = (data) => {
+    const msg = data?.choices?.[0]?.message || {};
+    const u = data?.usage || {};
+    return {
+      content: msg.content ? stripThinking(msg.content) : '',
+      tool_calls: msg.tool_calls || null,
+      usage: { prompt: Number(u.prompt_tokens || 0), completion: Number(u.completion_tokens || 0) },
+    };
   };
+
+  if (custom) {
+    const url = `${custom.baseUrl.replace(/\/+$/, '')}/chat/completions`;
+    return parse(await _fetchJson(url, custom.apiKey, body, 'chat'));
+  }
+  return withRotation(cfg, 'chat', async (acc) => {
+    const url = `https://api.cloudflare.com/client/v4/accounts/${acc.accountId}/ai/v1/chat/completions`;
+    return parse(await _fetchJson(url, acc.apiToken, body, 'chat'));
+  });
 }
 
 /** Quita el bloque de razonamiento de modelos "thinking" (defensa; GLM va con thinking off). */
