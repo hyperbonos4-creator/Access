@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VISIONYX Telecom · Demo real</title>
+  <meta name="description" content="Prueba el software real de VISIONYX Telecom (OSS/BSS para ISP): CRM, facturación, cartera georreferenciada, recaudo y la cabina contable. Sesión privada que se borra sola." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .demo-wrap { max-width: 920px; margin: 0 auto; padding: 30px 20px 80px; position: relative; z-index: 1; }
+    .demo-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+    .demo-badge { font-size: .72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); border: 1px solid var(--border-strong); border-radius: 999px; padding: 6px 14px; }
+    .demo-head h1 { font-size: clamp(1.8rem,4.5vw,2.6rem); }
+    .demo-head p { color: var(--muted); max-width: 64ch; margin-top: 12px; }
+    .grid2 { display: grid; grid-template-columns: 1.1fr .9fr; gap: 30px; margin-top: 30px; align-items: start; }
+    .steps { list-style: none; display: grid; gap: 14px; }
+    .steps li { display: flex; gap: 14px; align-items: flex-start; color: var(--muted); }
+    .steps b { color: var(--text); }
+    .steps .n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #04121a; background: var(--grad); font-size: .85rem; }
+    .launch { background: linear-gradient(165deg, var(--panel), var(--bg-alt)); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .launch h2 { font-size: 1.15rem; }
+    .creds { background: var(--bg); border: 1px dashed var(--border-strong); border-radius: 12px; padding: 14px 16px; margin: 16px 0; display: grid; gap: 6px; font-size: .92rem; }
+    .creds code { color: var(--cyan); font-family: monospace; user-select: all; }
+    .cred-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .cred-copy { flex: none; font-size: .78rem; font-weight: 700; color: #04121a; background: var(--grad); border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer; transition: transform .12s, filter .2s; }
+    .cred-copy:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    .cred-copy.done { background: rgba(40,224,160,.18); color: var(--ok,#28e0a0); border: 1px solid rgba(40,224,160,.5); }
+    .launch .btn { width: 100%; margin-top: 10px; }
+    .note { font-size: .82rem; color: var(--muted-2); margin-top: 16px; }
+    .warn { background: rgba(255,193,77,.08); border: 1px solid rgba(255,193,77,.3); border-radius: 12px; padding: 14px 16px; margin-top: 24px; color: var(--muted); font-size: .88rem; }
+    .ttl { display: flex; align-items: center; gap: 14px; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+    .ttl-ring { position: relative; width: 64px; height: 64px; flex: none; }
+    .ttl-ring svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+    .ttl-ring circle { fill: none; stroke-width: 6; }
+    .ttl-bg { stroke: rgba(255,255,255,.08); }
+    .ttl-arc { stroke: var(--cyan); stroke-linecap: round; stroke-dasharray: 175.9; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke .4s; }
+    .ttl-ring span { position: absolute; inset: 0; display: grid; place-items: center; font-family: monospace; font-weight: 700; font-size: .8rem; color: var(--text); }
+    .ttl-txt { display: flex; flex-direction: column; gap: 3px; font-size: .9rem; }
+    .ttl-txt b { color: var(--text); }
+    .ttl-txt span { color: var(--muted); font-size: .82rem; }
+    .ttl.ending .ttl-arc { stroke: var(--danger,#ff5470); }
+    .ttl.ending .ttl-ring span { color: var(--danger,#ff5470); }
+    .feat { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-top: 6px; }
+    .feat span { font-size: .82rem; color: var(--muted); display: flex; gap: 8px; }
+    .feat span b { color: var(--cyan); font-weight: 700; }
+    @media (max-width: 760px){ .grid2 { grid-template-columns: 1fr; } .launch { order: -1; } .feat { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body style="display:block; min-height:100vh; position:relative">
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="demo-wrap">
+    <div class="demo-bar">
+      <a class="brand" href="index.html" style="display:flex;align-items:center;gap:11px"><img src="vx-mark.svg" alt="" height="34" width="34" /><span class="brand__word">VISION<span class="brand__yx">YX</span></span></a>
+      <span class="demo-badge">● Demo real · Telecom</span>
+    </div>
+
+    <div class="demo-head">
+      <h1>Prueba el software real de <span class="accent">VISIONYX Telecom</span></h1>
+      <p>No es una simulación: es la plataforma OSS/BSS para operadores de internet
+        corriendo en nuestro servidor. Entra y explora el CRM, la facturación, la
+        cartera georreferenciada, el recaudo y la <b>cabina financiero-contable</b> (PUC
+        Colombia, DIAN) con datos reales de un ISP de ejemplo.</p>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <ol class="steps">
+          <li><span class="n">1</span><div><b>Genera tu acceso</b> de prueba con un clic.</div></li>
+          <li><span class="n">2</span><div>Abre la plataforma e <b>inicia sesión</b> con las credenciales temporales.</div></li>
+          <li><span class="n">3</span><div>Explora el <b>Centro de control financiero</b>: alertas, salud, cartera por barrio y cierre.</div></li>
+          <li><span class="n">4</span><div>Revisa <b>facturación recurrente</b>, recibos de caja, conciliación y reportes (DIAN/NIIF).</div></li>
+          <li><span class="n">5</span><div>Mira el <b>mapa GIS</b> de cobertura y la red (NAP/zonas).</div></li>
+        </ol>
+        <div class="feat">
+          <span><b>◆</b> CRM + facturación</span>
+          <span><b>◆</b> Cartera georreferenciada</span>
+          <span><b>◆</b> Recaudo y conciliación</span>
+          <span><b>◆</b> Contabilidad PUC + DIAN</span>
+          <span><b>◆</b> Cobranza por WhatsApp</span>
+          <span><b>◆</b> GIS de cobertura</span>
+        </div>
+        <div class="warn">🛡️ <b>Entorno de demostración.</b> Tu sesión usa <b>credenciales temporales</b>
+          que se <b>eliminan automáticamente</b> al expirar. Es un entorno de prueba con datos
+          ficticios, aislado del entorno productivo; no ingreses datos reales de clientes.</div>
+      </div>
+
+      <div class="launch">
+        <h2>Tu acceso de prueba</h2>
+
+        <div id="gen-state">
+          <p class="note" style="margin-top:0">Genera unas <b>credenciales temporales</b>
+            para entrar a la plataforma. Al terminar, se borran solas.</p>
+          <button id="btn-gen" class="btn btn--primary">⚡ Generar mi acceso de prueba</button>
+          <p id="gen-err" class="note" style="color:var(--danger,#ff5470);display:none"></p>
+        </div>
+
+        <div id="live-state" style="display:none">
+          <div class="ttl" id="ttl-box">
+            <div class="ttl-ring" aria-hidden="true">
+              <svg viewBox="0 0 64 64"><circle class="ttl-bg" cx="32" cy="32" r="28"/><circle id="ttl-arc" class="ttl-arc" cx="32" cy="32" r="28"/></svg>
+              <span id="ttl-clock">60:00</span>
+            </div>
+            <div class="ttl-txt">
+              <b>Tu sesión está activa</b>
+              <span id="ttl-sub">Se autodestruye en 60 minutos.</span>
+            </div>
+          </div>
+          <div class="creds">
+            <div class="cred-row"><span>Usuario: <code id="cred-user">—</code></span><button class="cred-copy" data-copy-target="cred-user">Copiar</button></div>
+            <div class="cred-row"><span>Clave: <code id="cred-pass">—</code></span><button class="cred-copy" data-copy-target="cred-pass">Copiar</button></div>
+          </div>
+          <a id="lnk-app" class="btn btn--primary" href="#" target="_blank" rel="noopener">Abrir la plataforma →</a>
+          <button id="btn-renew" class="btn btn--ghost" style="display:none">Generar una sesión nueva</button>
+          <p class="note">Inicia sesión con el usuario y la clave de arriba.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:40px">
+      <p class="muted" style="margin-bottom:14px">¿Lo quieres para tu operación ISP?</p>
+      <a class="btn btn--primary" href="index.html#contacto">Habla con un experto</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Backend del demo de Telecom (cicanet). Ajustar al subdominio del demo.
+      var API = 'https://demo-telecom.visionyx.lat/api';
+      var APP = 'https://demo-telecom.visionyx.lat';
+      var LS = 'vyx_demo_telecom';
+      var RING = 175.9; // 2π·28
+      var ticket = null, timer = null;
+      var $ = function (id) { return document.getElementById(id); };
+
+      document.addEventListener('click', function (e) {
+        var b = e.target.closest('.cred-copy');
+        if (!b) return;
+        var target = b.getAttribute('data-copy-target');
+        var text = target && $(target) ? $(target).textContent : '';
+        if (!text || text === '—') return;
+        var done = function () {
+          var prev = b.textContent; b.textContent = '✓ Copiado'; b.classList.add('done');
+          setTimeout(function () { b.textContent = prev; b.classList.remove('done'); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(fallback);
+        } else { fallback(); }
+        function fallback() {
+          var t = document.createElement('textarea');
+          t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+          document.body.appendChild(t); t.focus(); t.select();
+          try { document.execCommand('copy'); done(); } catch (e2) {}
+          document.body.removeChild(t);
+        }
+      });
+
+      function fmt(ms) {
+        var s = Math.max(0, Math.floor(ms / 1000));
+        var m = Math.floor(s / 60); s = s % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function showLive(t) {
+        ticket = t;
+        $('gen-state').style.display = 'none';
+        $('live-state').style.display = 'block';
+        $('cred-user').textContent = t.username;
+        $('cred-pass').textContent = t.password;
+        $('lnk-app').href = (t.appUrl || APP) + '/login';
+        $('ttl-sub').textContent = 'Se autodestruye en ' + t.ttlMinutes + ' minutos. Al expirar se borran las credenciales y la actividad.';
+        startTimer();
+      }
+
+      function startTimer() {
+        if (timer) clearInterval(timer);
+        var total = ticket.ttlMinutes * 60000;
+        var tick = function () {
+          var left = new Date(ticket.expiresAt).getTime() - Date.now();
+          $('ttl-clock').textContent = fmt(left);
+          var frac = Math.max(0, Math.min(1, left / total));
+          $('ttl-arc').style.strokeDashoffset = String(RING * (1 - frac));
+          $('ttl-box').classList.toggle('ending', left < 5 * 60000);
+          if (left <= 0) {
+            clearInterval(timer); timer = null;
+            localStorage.removeItem(LS);
+            $('ttl-clock').textContent = '00:00';
+            $('ttl-sub').textContent = 'La sesión expiró y sus credenciales fueron eliminadas del servidor.';
+            $('btn-renew').style.display = 'block';
+            $('lnk-app').style.opacity = '.5';
+          }
+        };
+        tick();
+        timer = setInterval(tick, 1000);
+      }
+
+      function generate() {
+        var btn = $('btn-gen'); btn.disabled = true; btn.textContent = 'Creando tu sesión…';
+        $('gen-err').style.display = 'none';
+        fetch(API + '/demo/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+          .then(function (r) { if (!r.ok) return r.json().then(function (b) { throw new Error(b.message || 'No se pudo crear la sesión'); }); return r.json(); })
+          .then(function (t) { localStorage.setItem(LS, JSON.stringify(t)); showLive(t); })
+          .catch(function (e) {
+            btn.disabled = false; btn.textContent = '⚡ Generar mi acceso de prueba';
+            $('gen-err').textContent = e.message || 'No se pudo crear la sesión. Intenta de nuevo.';
+            $('gen-err').style.display = 'block';
+          });
+      }
+
+      $('btn-gen').addEventListener('click', generate);
+      $('btn-renew').addEventListener('click', function () {
+        localStorage.removeItem(LS);
+        $('live-state').style.display = 'none';
+        $('gen-state').style.display = 'block';
+        $('btn-gen').disabled = false; $('btn-gen').textContent = '⚡ Generar mi acceso de prueba';
+      });
+
+      try {
+        var saved = JSON.parse(localStorage.getItem(LS) || 'null');
+        if (saved && saved.expiresAt && new Date(saved.expiresAt).getTime() > Date.now()) showLive(saved);
+      } catch (e) {}
+    })();
+  </script>
+  <script defer src="assistant.js"></script>
+</body>
+</html>
