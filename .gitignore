@@ -31,3 +31,11 @@ vision/models/*
 
 # Logs
 *.log
+
+# Runbooks con credenciales (PAT de GitHub / llave SSH) — NUNCA subir
+DEPLOY-SERVER.md
+BUILD.md
+
+# Material auxiliar local (no es del producto)
+LOGO copy.png
+pro/

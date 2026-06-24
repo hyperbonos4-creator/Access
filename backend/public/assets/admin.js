@@ -31,6 +31,7 @@ const state = {
   points: [],
   subjects: [],
   enroll: { subjectId: null, base64: null, stream: null },
+  events: [],
 };
 
 boot();
@@ -46,6 +47,7 @@ function bindGlobal() {
   $('login-pass').addEventListener('keydown', (e) => e.key === 'Enter' && doLogin());
   $('btn-logout').onclick = () => { setToken(TOKEN_KEY, ''); location.reload(); };
   document.querySelectorAll('.nav-item').forEach((b) => (b.onclick = () => switchTab(b.dataset.tab)));
+  document.querySelectorAll('[data-tab-link]').forEach((b) => (b.onclick = () => switchTab(b.dataset.tabLink)));
 
   $('cam-create').onclick = createCamera;
   $('cam-mode-device').onclick = chooseDeviceCam;
@@ -64,7 +66,13 @@ function bindGlobal() {
   $('sub-create').onclick = createSubject;
   $('sub-refresh').onclick = loadSubjects;
   $('ev-refresh').onclick = loadEvents;
+  $('ev-export').onclick = exportEventsCsv;
   $('sys-refresh').onclick = loadDiagnostics;
+  // Filtros del panel de auditoría (recargan la tabla sin pedir al backend)
+  $('ev-f-point').onchange = renderEvents;
+  $('ev-f-decision').onchange = renderEvents;
+  $('ev-f-search').oninput = renderEvents;
+  $('ev-f-limit').onchange = loadEvents;
 
   // Enroll modal
   $('enroll-close').onclick = closeEnroll;
@@ -96,12 +104,14 @@ async function doLogin() {
 async function init() {
   try {
     const me = await api.get('/auth/me', state.token);
+    state.user = me;
     $('who').textContent = `${me.name} · ${me.role}`;
+    const du = $('dash-user'); if (du) du.textContent = (me.name || 'Admin').split(' ')[0];
   } catch (e) {
     if (e instanceof ApiError && e.status === 401) { setToken(TOKEN_KEY, ''); return show('modal-login'); }
   }
   checkVision();
-  switchTab('cameras');
+  switchTab('dashboard');
 }
 
 async function checkVision() {
@@ -122,6 +132,7 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.tab').forEach((t) => t.classList.add('hidden'));
   $(`tab-${tab}`).classList.remove('hidden');
+  if (tab === 'dashboard') loadDashboard();
   if (tab === 'cameras') { resetCamOnboard(); loadCameras(); }
   if (tab === 'points') { setLevel(state.ptLevel || 'NORMAL'); updateRefField(); loadCameras().then(fillCamSelect); loadPoints(); startDoorPoll(); }
   if (tab === 'subjects') { loadPoints(); loadSubjects(); }
@@ -133,6 +144,76 @@ function guard(e) {
   if (e instanceof ApiError && e.status === 401) { setToken(TOKEN_KEY, ''); show('modal-login'); return true; }
   toast(e instanceof ApiError ? e.message : 'Error de red', 'err');
   return false;
+}
+
+/* ── Dashboard (Inicio) ─────────────────────────────────────────────────────
+ * Vista de aterrizaje: KPIs de un vistazo (cámaras, puntos, empleados, estado),
+ * actividad reciente y accesos rápidos. Hidrata los catálogos para resolver
+ * nombres en la actividad y anima los contadores al entrar. */
+async function loadDashboard() {
+  try {
+    const [cams, points, subjects] = await Promise.all([
+      api.get('/cameras', state.token).catch(() => []),
+      api.get('/access/points', state.token).catch(() => []),
+      api.get('/access/subjects', state.token).catch(() => []),
+    ]);
+    state.cameras = cams; state.points = points; state.subjects = subjects;
+    let health = { ok: false };
+    try { health = await api.get('/access/health', state.token); } catch { /* offline */ }
+    let recent = [];
+    try { recent = await api.get('/access/events?limit=6', state.token); } catch { /* sin eventos */ }
+    renderDashboard(cams, points, subjects, health, recent);
+  } catch (e) { guard(e); }
+}
+
+function dashKpi(icon, value, label) {
+  return `<div class="dash-kpi"><div class="dash-kpi__icon">${icon}</div><div class="dash-kpi__v" data-count="${value}">0</div><div class="dash-kpi__l">${label}</div></div>`;
+}
+function dashKpiState(icon, txt, label, cls) {
+  return `<div class="dash-kpi state ${cls}"><div class="dash-kpi__icon">${icon}</div><div class="dash-kpi__v"><span class="live-dot ${cls}"></span>${txt}</div><div class="dash-kpi__l">${label}</div></div>`;
+}
+
+function renderDashboard(cams, points, subjects, health, recent) {
+  const sys = health.ok ? { txt: 'En línea', cls: 'ok' } : { txt: 'Revisar', cls: 'warn' };
+  $('dash-kpis').innerHTML =
+    dashKpi('📷', cams.length, 'Cámaras') +
+    dashKpi('🚪', points.length, 'Puntos de acceso') +
+    dashKpi('👤', subjects.length, 'Empleados') +
+    dashKpiState('🩺', sys.txt, 'Estado del sistema', sys.cls);
+  animateCounts();
+
+  const host = $('dash-recent');
+  if (!recent.length) {
+    host.innerHTML = '<div class="empty" style="padding:24px 0">Sin actividad todavía. Registra un rostro y pruébalo en el kiosko.</div>';
+    return;
+  }
+  host.innerHTML = recent.slice(0, 6).map((e) => {
+    const ok = e.decision === 'GRANTED';
+    const s = subjectName(e.subjectId);
+    const when = new Date(e.recordedAt);
+    const t = when.toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return `<div class="dash-row">
+      <span class="dash-row__ic ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✕'}</span>
+      <div class="dash-row__who"><b>${esc(s.name)}</b><small>${esc(pointName(e.accessPointId))} · ${esc(t)}</small></div>
+      <span class="ev-verdict ${ok ? 'granted' : 'denied'}">${ok ? 'Concedido' : 'Denegado'}</span>
+    </div>`;
+  }).join('');
+}
+
+/** Anima los contadores de 0 al valor (ease-in-out), respeta reduce-motion. */
+function animateCounts() {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('#dash-kpis .dash-kpi__v[data-count]').forEach((el) => {
+    const target = Number(el.dataset.count) || 0;
+    if (reduce || target === 0) { el.textContent = String(target); return; }
+    const dur = 650, start = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = String(Math.round(target * (0.5 - Math.cos(Math.PI * p) / 2)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
 }
 
 /* ── Cámaras ────────────────────────────────────────────────────────────── */
@@ -180,10 +261,14 @@ function renderCameras() {
     <div class="item">
       <div class="spread">
         <div><h4>${esc(c.name)}</h4><div class="sub">${c.externalKey ? 'clave: ' + esc(c.externalKey) + ' · ' : ''}canal NVR: ${c.nvrChannel ?? 0} · <span class="tag">${esc(tr(T.status, c.status))}</span></div></div>
-        <button class="btn danger sm" data-del="${c.id}">Eliminar</button>
+        <details class="kebab"><summary aria-label="Opciones">⋯</summary>
+          <div class="kebab__body">
+            <button class="kebab__item danger" data-del="${c.id}">🗑 Eliminar cámara</button>
+          </div>
+        </details>
       </div>
     </div>`).join('');
-  host.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => delCamera(b.dataset.del)));
+  host.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => { b.closest('.kebab')?.removeAttribute('open'); delCamera(b.dataset.del); }));
 }
 async function createCamera() {
   const body = {
@@ -561,21 +646,189 @@ async function submitEnroll() {
   }
 }
 
-/* ── Eventos ────────────────────────────────────────────────────────────── */
+/* ── Eventos · Panel de auditoría ────────────────────────────────────────── */
+/**
+ * Carga el histórico del backend y, antes de pintar, hidrata `state.subjects`
+ * y `state.points` para poder resolver IDs → nombres legibles en la tabla.
+ * La tabla se renderiza por `renderEvents()`, que también aplica los filtros
+ * del cliente (punto, decisión, búsqueda) sin volver a golpear la API.
+ */
 async function loadEvents() {
   try {
-    const evs = await api.get('/access/events?limit=50', state.token);
-    const host = $('ev-list');
-    if (!evs.length) return (host.innerHTML = '<div class="empty">Sin eventos registrados.</div>');
-    host.innerHTML = evs.map((e) => {
-      const ok = e.decision === 'GRANTED';
-      return `<div class="item"><div class="spread">
-        <div><h4>${ok ? '✔' : '✕'} ${esc(tr(T.decision, e.decision))} <span class="muted" style="font-weight:400">· ${esc(tr(T.reason, e.reason))}</span></h4>
-        <div class="sub">${new Date(e.recordedAt).toLocaleString()} · coincidencia ${e.matchScore != null ? Math.round(e.matchScore * 100) + '%' : '—'} · vida ${e.livenessScore != null ? Math.round(e.livenessScore * 100) + '%' : '—'}</div></div>
-        <span class="pill ${ok ? 'ok' : 'danger'}">${e.doorActuated ? '🔓 abierta' : '🔒 cerrada'}</span>
-      </div></div>`;
-    }).join('');
+    const limit = $('ev-f-limit')?.value || 100;
+    // Hidratar catálogos para resolver nombres (en paralelo, tolerando fallos).
+    if (!state.subjects.length) { try { state.subjects = await api.get('/access/subjects', state.token); } catch {} }
+    if (!state.points.length) { try { state.points = await api.get('/access/points', state.token); } catch {} }
+    fillPointFilter();
+    state.events = await api.get(`/access/events?limit=${encodeURIComponent(limit)}`, state.token);
+    renderEvents();
   } catch (e) { guard(e); }
+}
+
+/** Llena el <select> de filtro por punto con las puertas reales. */
+function fillPointFilter() {
+  const sel = $('ev-f-point');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Todos los puntos</option>' +
+    state.points.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  sel.value = current;
+}
+
+/** Devuelve el nombre legible de un sujeto/jefe o un marcador de desconocido. */
+function subjectName(id) {
+  if (!id) return { name: 'Desconocido', sub: 'Persona no registrada', unknown: true };
+  const s = state.subjects.find((x) => x.id === id);
+  return { name: s?.fullName || 'Empleado eliminado', sub: s?.employeeCode || (s ? tr(T.kind, s.kind) : 'ID no encontrado'), unknown: false };
+}
+function pointName(id) {
+  if (!id) return '—';
+  return state.points.find((p) => p.id === id)?.name || 'Punto eliminado';
+}
+function actorLabel(e) {
+  if (e.actorId) return { txt: 'Operador', cls: 'warn' };
+  if (e.reason === 'MANUAL') return { txt: 'Prueba admin', cls: 'warn' };
+  return { txt: 'Automático', cls: '' };
+}
+
+/** Aplica filtros del cliente y pinta KPIs + tabla. */
+function renderEvents() {
+  const fPoint = $('ev-f-point').value;
+  const fDecision = $('ev-f-decision').value;
+  const q = ($('ev-f-search').value || '').trim().toLowerCase();
+
+  const filtered = state.events.filter((e) => {
+    if (fPoint && e.accessPointId !== fPoint) return false;
+    if (fDecision && e.decision !== fDecision) return false;
+    if (q) {
+      const s = subjectName(e.subjectId);
+      const hay = [
+        s.name, pointName(e.accessPointId),
+        tr(T.reason, e.reason), tr(T.decision, e.decision),
+        e.doorActuated ? 'abierta concedido' : 'cerrada denegado',
+      ].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  computeKpis(filtered);
+  const tbody = $('ev-tbody');
+  const empty = $('ev-empty');
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = filtered.map((e) => {
+    const ok = e.decision === 'GRANTED';
+    const s = subjectName(e.subjectId);
+    const when = new Date(e.recordedAt);
+    const dateStr = when.toLocaleDateString('es-CO');
+    const timeStr = when.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const actor = actorLabel(e);
+    const matchV = e.matchScore != null ? Math.round(e.matchScore * 100) : null;
+    const liveV = e.livenessScore != null ? Math.round(e.livenessScore * 100) : null;
+    const reasonCls = e.reason === 'UNKNOWN_SUBJECT' || e.reason === 'LIVENESS_FAILED' ? 'unknown' : '';
+
+    const snap = e.snapshotUrl
+      ? `<img class="ev-snap" src="${esc(e.snapshotUrl)}" alt="frame" loading="lazy" onerror="this.outerHTML='<div class=\\'ev-snap-none\\'>🚫</div>'" />`
+      : `<div class="ev-snap-none">${ok ? '✓' : '?'}</div>`;
+
+    return `<tr>
+      <td>${snap}</td>
+      <td class="ev-time">${esc(dateStr)}<small>${esc(timeStr)}</small></td>
+      <td class="ev-who">${esc(s.name)}${s.unknown ? '' : `<small>${esc(s.sub)}</small>`}</td>
+      <td class="ev-door">${esc(pointName(e.accessPointId))}</td>
+      <td><span class="ev-verdict ${ok ? 'granted' : 'denied'}">${ok ? '✔ Concedido' : '✕ Denegado'}</span></td>
+      <td class="ev-reason ${reasonCls}">${esc(tr(T.reason, e.reason))}${e.doorActuated ? ' · 🔓' : ''}</td>
+      <td>${scoreCell(matchV)}</td>
+      <td>${scoreCell(liveV)}</td>
+      <td class="ev-actor"><span class="pill ${actor.cls}">${esc(actor.txt)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/** Barra de score con valor numérico. `null` → guion. */
+function scoreCell(v) {
+  if (v == null) return `<div class="ev-score na"><span class="meter"></span><b>—</b></div>`;
+  const cls = v >= 60 ? 'ok' : 'bad';
+  return `<div class="ev-score"><span class="meter ${cls}"><i style="width:${v}%"></i></span><b>${v}%</b></div>`;
+}
+
+/** Calcula y pinta los KPIs sobre el subconjunto filtrado. */
+function computeKpis(rows) {
+  const host = $('ev-kpis');
+  const total = rows.length;
+  const granted = rows.filter((r) => r.decision === 'GRANTED').length;
+  const denied = total - granted;
+  // Tasa de éxito sobre intentos de reconocimiento (excluye aperturas manuales).
+  const auto = rows.filter((r) => r.reason !== 'MANUAL');
+  const autoGranted = auto.filter((r) => r.decision === 'GRANTED').length;
+  const rate = auto.length ? Math.round((autoGranted / auto.length) * 100) : null;
+
+  const last = rows.length ? new Date(rows[0].recordedAt) : null;
+  const lastTxt = last ? `${last.toLocaleDateString('es-CO')} ${last.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}` : '—';
+
+  host.innerHTML = `
+    <div class="ev-kpi info"><div class="l">Intentos</div><div class="v">${total}</div><div class="d">${granted} concedidos · ${denied} denegados</div></div>
+    <div class="ev-kpi ok"><div class="l">Concedidos</div><div class="v">${granted}</div><div class="d">aperturas autorizadas</div></div>
+    <div class="ev-kpi danger"><div class="l">Denegados</div><div class="v">${denied}</div><div class="d">intentos rechazados</div></div>
+    <div class="ev-kpi info"><div class="l">Tasa de éxito</div><div class="v">${rate == null ? '—' : rate + '%'}</div><div class="d">Último: ${esc(lastTxt)}</div></div>`;
+}
+
+/** Exporta el conjunto filtrado a CSV (auditable, abre en Excel). */
+function exportEventsCsv() {
+  const fPoint = $('ev-f-point').value;
+  const fDecision = $('ev-f-decision').value;
+  const q = ($('ev-f-search').value || '').trim().toLowerCase();
+  const rows = state.events.filter((e) => {
+    if (fPoint && e.accessPointId !== fPoint) return false;
+    if (fDecision && e.decision !== fDecision) return false;
+    if (q) {
+      const s = subjectName(e.subjectId);
+      const hay = [s.name, pointName(e.accessPointId), tr(T.reason, e.reason), tr(T.decision, e.decision)].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (!rows.length) return toast('No hay eventos para exportar.', 'err');
+
+  const header = ['fecha', 'hora', 'quien', 'codigo', 'punto', 'decision', 'motivo', 'coincidencia_%', 'vida_%', 'modo_vida', 'puerta', 'origen'];
+  const lines = rows.map((e) => {
+    const s = subjectName(e.subjectId);
+    const when = new Date(e.recordedAt);
+    const actor = actorLabel(e);
+    return [
+      when.toLocaleDateString('es-CO'),
+      when.toLocaleTimeString('es-CO'),
+      s.name,
+      s.sub,
+      pointName(e.accessPointId),
+      tr(T.decision, e.decision),
+      tr(T.reason, e.reason),
+      e.matchScore != null ? Math.round(e.matchScore * 100) : '',
+      e.livenessScore != null ? Math.round(e.livenessScore * 100) : '',
+      e.livenessMode || '',
+      e.doorActuated ? 'abierta' : 'cerrada',
+      actor.txt,
+    ];
+  });
+  const csv = [header, ...lines]
+    .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  // BOM para que Excel respete UTF-8 (tildes).
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `auditoria-visionyx-access-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`Exportados ${rows.length} eventos.`, 'ok');
 }
 
 /* ── Diagnóstico del sistema ────────────────────────────────────────────── */

@@ -58,10 +58,10 @@ body::before {
   content: "";
   position: fixed; inset: 0;
   background-image:
-    linear-gradient(rgba(80, 140, 240, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(80, 140, 240, 0.05) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: radial-gradient(circle at 50% 40%, black, transparent 80%);
+    linear-gradient(rgba(80, 140, 240, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80, 140, 240, 0.028) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at 50% 28%, black, transparent 72%);
   pointer-events: none;
   z-index: 0;
 }
@@ -166,3 +166,10 @@ select option { background: var(--bg-2); }
   border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: var(--cyan);
   animation: spin 0.7s linear infinite;
 }
+
+/* Punto de estado "en vivo" (pulso suave) */
+@keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.6; } }
+.live-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; background: var(--ok); animation: pulseDot 1.8s ease-in-out infinite; }
+.live-dot.warn { background: var(--warn); }
+.live-dot.danger { background: var(--danger); }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }

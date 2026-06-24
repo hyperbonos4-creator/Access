@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/theme.css?v=3" />
-  <link rel="stylesheet" href="assets/admin.css?v=3" />
+  <link rel="stylesheet" href="assets/theme.css?v=4" />
+  <link rel="stylesheet" href="assets/admin.css?v=5" />
 </head>
 <body>
   <header class="admin-top">
@@ -26,24 +26,54 @@
 
   <div class="admin-shell">
     <nav class="admin-nav card">
-      <button class="nav-item active" data-tab="cameras">📷 Cámaras</button>
-      <button class="nav-item" data-tab="points">🚪 Puntos de acceso</button>
-      <button class="nav-item" data-tab="subjects">👤 Empleados</button>
-      <button class="nav-item" data-tab="events">📋 Eventos</button>
-      <button class="nav-item" data-tab="system">🩺 Sistema</button>
+      <button class="nav-item active" data-tab="dashboard"><span class="ni-ico">▦</span><span>Inicio</span></button>
+      <button class="nav-item" data-tab="cameras"><span class="ni-ico">📷</span><span>Cámaras</span></button>
+      <button class="nav-item" data-tab="points"><span class="ni-ico">🚪</span><span>Puntos de acceso</span></button>
+      <button class="nav-item" data-tab="subjects"><span class="ni-ico">👤</span><span>Empleados</span></button>
+      <button class="nav-item" data-tab="events"><span class="ni-ico">📋</span><span>Eventos</span></button>
+      <button class="nav-item" data-tab="system"><span class="ni-ico">🩺</span><span>Sistema</span></button>
       <div class="nav-foot">
         <div id="vision-health" class="pill">Vision —</div>
       </div>
     </nav>
 
     <main class="admin-content">
+      <!-- Inicio / Dashboard -->
+      <section id="tab-dashboard" class="tab">
+        <div class="dash-head">
+          <div>
+            <h2 class="dash-title">Hola, <span id="dash-user">Admin</span></h2>
+            <p class="sub">Resumen de tu control de acceso en tiempo real.</p>
+          </div>
+          <a class="btn ghost sm" href="/kiosk/" target="_blank" rel="noopener">🖥 Abrir kiosko</a>
+        </div>
+        <div class="dash-kpis" id="dash-kpis">
+          <div class="dash-kpi"><div class="dash-kpi__icon">📷</div><div class="dash-kpi__v">—</div><div class="dash-kpi__l">Cámaras</div></div>
+          <div class="dash-kpi"><div class="dash-kpi__icon">🚪</div><div class="dash-kpi__v">—</div><div class="dash-kpi__l">Puntos de acceso</div></div>
+          <div class="dash-kpi"><div class="dash-kpi__icon">👤</div><div class="dash-kpi__v">—</div><div class="dash-kpi__l">Empleados</div></div>
+          <div class="dash-kpi state"><div class="dash-kpi__icon">🩺</div><div class="dash-kpi__v">—</div><div class="dash-kpi__l">Estado del sistema</div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="card pad">
+            <div class="spread"><h3>Actividad reciente</h3><button class="btn ghost sm" data-tab-link="events">Ver todo →</button></div>
+            <div id="dash-recent" class="dash-recent"></div>
+          </div>
+          <div class="card pad dash-quick">
+            <h3>Acciones rápidas</h3>
+            <button class="btn ghost dash-q" data-tab-link="cameras"><span>📷</span> Conectar una cámara</button>
+            <button class="btn ghost dash-q" data-tab-link="subjects"><span>👤</span> Registrar un empleado</button>
+            <button class="btn ghost dash-q" data-tab-link="points"><span>🚪</span> Crear punto de acceso</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Cámaras -->
-      <section id="tab-cameras" class="tab">
+      <section id="tab-cameras" class="tab hidden">
         <div class="card pad" id="cam-onboard">
           <h3>Conecta tu primera cámara</h3>
           <p class="sub" style="margin:6px 0 18px">¿Cómo quieres capturar el rostro en la puerta? Para probar ahora mismo, usa la cámara de este dispositivo.</p>
           <div class="cam-options">
-            <button class="cam-opt" id="cam-mode-device">
+            <button class="cam-opt cam-opt--hero" id="cam-mode-device">
               <span class="cam-opt__tag">Recomendado</span>
               <span class="cam-opt__i">📱</span>
               <b>Usar la cámara de este dispositivo</b>
@@ -179,13 +209,74 @@
         <div id="sub-list" class="list"></div>
       </section>
 
-      <!-- Eventos -->
+      <!-- Eventos · Panel de auditoría -->
       <section id="tab-events" class="tab hidden">
-        <div class="card pad spread">
-          <h3>Últimos eventos de acceso</h3>
-          <button id="ev-refresh" class="btn ghost sm">Actualizar</button>
+        <div class="card pad">
+          <div class="spread ev-head">
+            <div>
+              <h3>Bitácora de auditoría</h3>
+              <p class="sub" style="margin-top:4px">Cada intento de acceso queda registrado de forma inmutable: quién, cuándo, dónde, decisión y motivo. Auditoría completa.</p>
+            </div>
+            <div class="row" style="gap:8px">
+              <button id="ev-export" class="btn ghost sm">⬇ Exportar CSV</button>
+              <button id="ev-refresh" class="btn ghost sm">↻ Actualizar</button>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="ev-kpis" id="ev-kpis"></div>
+
+          <!-- Filtros -->
+          <div class="ev-filters">
+            <label class="field ev-filter">
+              <span>Punto de acceso</span>
+              <select id="ev-f-point"><option value="">Todos</option></select>
+            </label>
+            <label class="field ev-filter">
+              <span>Decisión</span>
+              <select id="ev-f-decision">
+                <option value="">Todas</option>
+                <option value="GRANTED">✔ Concedido</option>
+                <option value="DENIED">✕ Denegado</option>
+              </select>
+            </label>
+            <label class="field ev-filter">
+              <span>Buscar (nombre / motivo)</span>
+              <input id="ev-f-search" type="search" placeholder="Ej: María, denegado, vida…" />
+            </label>
+            <label class="field ev-filter">
+              <span>Mostrar</span>
+              <select id="ev-f-limit">
+                <option value="50">Últimos 50</option>
+                <option value="100" selected>Últimos 100</option>
+                <option value="200">Últimos 200</option>
+              </select>
+            </label>
+          </div>
         </div>
-        <div id="ev-list" class="list"></div>
+
+        <!-- Tabla de auditoría -->
+        <div class="card ev-table-wrap">
+          <div class="ev-table-scroll">
+            <table class="ev-table">
+              <thead>
+                <tr>
+                  <th class="ev-c-snap">Frame</th>
+                  <th class="ev-c-time">Fecha y hora</th>
+                  <th class="ev-c-who">Quién</th>
+                  <th class="ev-c-door">Puerta</th>
+                  <th class="ev-c-decision">Decisión</th>
+                  <th class="ev-c-reason">Motivo</th>
+                  <th class="ev-c-match">Coincidencia</th>
+                  <th class="ev-c-live">Vida</th>
+                  <th class="ev-c-actor">Origen</th>
+                </tr>
+              </thead>
+              <tbody id="ev-tbody"></tbody>
+            </table>
+          </div>
+          <div id="ev-empty" class="empty hidden">Sin eventos que coincidan con los filtros.</div>
+        </div>
       </section>
 
       <!-- Sistema / diagnóstico -->
@@ -234,6 +325,6 @@
   </div>
 
   <script src="assets/demo-banner.js?v=1"></script>
-  <script type="module" src="assets/admin.js?v=5"></script>
+  <script type="module" src="assets/admin.js?v=7"></script>
 </body>
 </html>
