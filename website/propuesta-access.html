@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VISIONYX Access · Propuesta de control de acceso facial — INP S.A.S. (Of. 9745)</title>
-  <meta name="description" content="Propuesta VISIONYX Access para INP S.A.S.: control de acceso facial fail-secure para la puerta corrediza de la Of. 9745. Dos opciones: cámara IP (recomendada) o tablet kiosko. Pruébelo en vivo antes de decidir." />
+  <title>VISIONYX Access · Plataforma de Identidad y Control de Acceso — Propuesta</title>
+  <meta name="description" content="VISIONYX Access: plataforma de identidad física con reconocimiento facial, prueba de vida y política fail-secure. Reconocimiento + auditoría + gestión de accesos. Pruébela en vivo." />
   <meta name="theme-color" content="#070b16" />
   <meta name="robots" content="noindex" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -99,18 +99,35 @@
     .flow__note { margin-top: 18px; padding: 14px 18px; border-radius: 12px; background: rgba(40,224,160,.07); border: 1px solid rgba(40,224,160,.28); color: var(--muted); font-size: .92rem; }
     .flow__note b { color: var(--ok); }
 
-    /* Hardware vs Software */
-    .hs { display: grid; grid-template-columns: 1fr 1.15fr; gap: 22px; align-items: stretch; }
-    .hs__card { background: linear-gradient(165deg, var(--panel), var(--bg-alt)); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 26px; }
-    .hs__card.is-soft { border-color: var(--border-strong); box-shadow: 0 0 0 1px rgba(34,211,238,.12), var(--shadow); }
-    .hs__card h3 { font-size: 1.15rem; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-    .hs__tag { font-size: .68rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted-2); font-weight: 700; }
-    .hs__list { list-style: none; display: grid; gap: 10px; margin-top: 16px; }
-    .hs__list li { display: flex; gap: 10px; color: var(--muted); font-size: .94rem; }
-    .hs__list li b { color: var(--text); font-weight: 600; }
-    .hs__list li::before { content: "▸"; color: var(--cyan); }
-    .hs__note { margin-top: 18px; font-size: .9rem; color: var(--text); background: rgba(34,211,238,.06); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; }
-    .hs__note b { color: var(--cyan); }
+    /* Bloque fail-secure / fail-safe (corrección conceptual) */
+    .failgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
+    .failcard { position: relative; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 24px; overflow: hidden; }
+    .failcard.sec { border-color: rgba(34,211,238,.4); }
+    .failcard.safe { border-color: rgba(255,180,84,.4); }
+    .failcard .tag { font-family: "Orbitron",sans-serif; font-size: .66rem; letter-spacing: 1.6px; font-weight: 800; }
+    .failcard.sec .tag { color: var(--cyan); } .failcard.safe .tag { color: var(--warn); }
+    .failcard h3 { font-size: 1.15rem; margin: 8px 0 10px; }
+    .failcard p { color: var(--muted); font-size: .92rem; }
+    .failcard .one-liner { font-weight: 700; color: var(--text); }
+    .failcard ul { list-style: none; display: grid; gap: 8px; margin-top: 14px; }
+    .failcard li { display: flex; gap: 9px; color: var(--muted); font-size: .9rem; }
+    .failcard.sec li::before { content: "🔒"; } .failcard.safe li::before { content: "🚪"; }
+
+    /* Capacidades (matriz) */
+    .caps { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .cap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 22px; }
+    .cap h3 { display: flex; align-items: center; gap: 10px; font-size: 1rem; margin-bottom: 12px; }
+    .cap .ic { font-size: 1.15rem; }
+    .cap ul { list-style: none; display: grid; gap: 8px; }
+    .cap li { display: flex; gap: 9px; color: var(--muted); font-size: .9rem; }
+    .cap li::before { content: "▸"; color: var(--cyan); font-weight: 800; }
+
+    /* Diferenciadores */
+    .diff { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+    .diff__card { background: linear-gradient(165deg, var(--panel), var(--bg-alt)); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; }
+    .diff__card h3 { font-size: 1rem; margin-bottom: 6px; display: flex; align-items: center; gap: 9px; }
+    .diff__card .ic { color: var(--cyan); font-size: 1.1rem; }
+    .diff__card p { color: var(--muted); font-size: .9rem; }
 
     /* Arquitectura empresarial */
     .arch { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
@@ -171,7 +188,7 @@
     .sc-led { animation: scLed 9s step-end infinite; }
     .sc-mag { animation: scMag 9s step-end infinite; }
 
-    /* Seguridad */
+    /* Seguridad / evacuación */
     .safe { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
     .safe__card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
     .safe__card h3 { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; margin-bottom: 10px; }
@@ -196,20 +213,21 @@
     .opt--b .opt__list li::before { color: var(--violet); }
     .opt__for { font-size: .86rem; color: var(--text); background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
     .opt__for b { color: var(--cyan); } .opt--b .opt__for b { color: var(--violet); }
-    .opt--rec { box-shadow: 0 0 0 2px var(--cyan), var(--shadow); }
-    .opt__ribbon { position: absolute; top: 16px; right: -36px; transform: rotate(45deg); background: var(--grad); color: #04121a; font-family: "Orbitron",sans-serif; font-weight: 800; font-size: .6rem; letter-spacing: 1px; padding: 5px 42px; z-index: 2; }
-    .why { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
-    .why__card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
-    .why__card.lock { border-color: var(--border-strong); }
-    .why__card h4 { font-size: 1rem; margin-bottom: 8px; display: flex; gap: 8px; align-items: center; }
-    .why__card p { color: var(--muted); font-size: .9rem; }
-    .why__card b { color: var(--text); }
 
-    /* Escalabilidad */
-    .scale { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-    .scale__item { display: flex; gap: 12px; align-items: flex-start; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
-    .scale__item .ic { color: var(--cyan); font-size: 1.1rem; }
-    .scale__item b { font-size: .95rem; } .scale__item p { color: var(--muted); font-size: .82rem; margin-top: 2px; }
+    /* Roadmap */
+    .roadmap { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .rm { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 24px; position: relative; overflow: hidden; }
+    .rm__tag { display: inline-block; font-family: "Orbitron",sans-serif; font-size: .64rem; letter-spacing: 1.5px; font-weight: 800; padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
+    .rm--now .rm__tag { background: rgba(40,224,160,.14); color: var(--ok); border: 1px solid rgba(40,224,160,.4); }
+    .rm--next .rm__tag { background: rgba(34,211,238,.12); color: var(--cyan); border: 1px solid rgba(34,211,238,.4); }
+    .rm--vision .rm__tag { background: rgba(168,85,247,.12); color: var(--violet); border: 1px solid rgba(168,85,247,.4); }
+    .rm h3 { font-size: 1.05rem; margin-bottom: 12px; }
+    .rm ul { list-style: none; display: grid; gap: 9px; }
+    .rm li { display: flex; gap: 9px; color: var(--muted); font-size: .9rem; }
+    .rm--now li::before { content: "✓"; color: var(--ok); font-weight: 800; }
+    .rm--next li::before { content: "▸"; color: var(--cyan); font-weight: 800; }
+    .rm--vision li::before { content: "◎"; color: var(--violet); font-weight: 800; }
+    .rm__foot { margin-top: 16px; font-size: .8rem; color: var(--muted-2); border-top: 1px solid var(--border); padding-top: 12px; }
 
     /* Inversión */
     .inv-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 28px; }
@@ -218,8 +236,9 @@
     .inv-card .lab { font-family: "Orbitron",sans-serif; font-size: .7rem; letter-spacing: 1.4px; }
     .inv-card.a .lab { color: var(--cyan); } .inv-card.b .lab { color: var(--violet); }
     .inv-card .tot { font-family: "Orbitron",sans-serif; font-weight: 800; font-size: 2rem; margin: 8px 0 4px; }
-    .inv-card .tot .zero { color: var(--muted-2); }
     .inv-card p { color: var(--muted); font-size: .86rem; }
+    .inv-card .from { font-size: .76rem; color: var(--muted-2); margin-top: 10px; }
+
     .spec { width: 100%; border-collapse: collapse; font-size: .9rem; margin-top: 8px; }
     .spec thead th { text-align: left; font-size: .68rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted-2); font-weight: 700; padding: 10px 12px; border-bottom: 1px solid var(--border); }
     .spec td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
@@ -228,7 +247,6 @@
     .spec tr.sub td { background: rgba(34,211,238,.05); font-weight: 700; color: var(--cyan); }
     .spec tr.total td { border-top: 2px solid var(--border-strong); border-bottom: 0; font-family: "Orbitron",sans-serif; font-weight: 800; font-size: 1.05rem; }
     .spec tr.total td.num { color: var(--text); }
-    .zero { color: var(--muted-2); font-style: italic; }
     .table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px 12px; overflow-x: auto; }
     .table-cap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 14px 4px 6px; }
     .table-cap .t { font-size: .72rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -260,66 +278,56 @@
     .firma .who { color: var(--muted); font-size: .9rem; }
     .firma .who b { color: var(--text); display: block; font-size: 1.05rem; }
 
-    /* Arquitectura (flujo) */
-    .archflow { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
-    .archflow__node { flex: 1 1 0; min-width: 116px; position: relative; background: linear-gradient(165deg, var(--panel), var(--bg-alt)); border: 1px solid var(--border); border-radius: 14px; padding: 16px 12px; text-align: center; }
-    .archflow__node .ic { font-size: 1.5rem; }
-    .archflow__node b { display: block; font-size: .86rem; margin-top: 6px; }
-    .archflow__node small { color: var(--muted); font-size: .72rem; }
-    .archflow__node.is-core { border-color: var(--border-strong); box-shadow: 0 0 0 1px rgba(34,211,238,.12), var(--shadow); }
-    .archflow__node:not(:last-child)::after { content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--cyan); font-weight: 800; z-index: 2; }
-    @media (max-width: 820px) { .archflow__node:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -15px; transform: translateX(50%); } }
+    /* Anexo técnico */
+    .annex { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 30px; }
+    .annex__head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .annex__head .tag { font-family: "Orbitron",sans-serif; font-size: .62rem; letter-spacing: 1.5px; color: var(--muted-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; }
+    .annex h2 { font-size: 1.5rem; }
+    .annex p.lead { color: var(--muted); font-size: .92rem; margin-top: 8px; max-width: 70ch; }
+    .annex__cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 22px; }
+    .annex__note { margin-top: 14px; font-size: .82rem; color: var(--muted-2); background: rgba(34,211,238,.04); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
 
-    /* Implementación · checklist */
-    .incl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .incl div { display: flex; gap: 10px; align-items: flex-start; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: .92rem; color: var(--text); }
-    .incl div::before { content: "✓"; color: var(--ok); font-weight: 800; flex: none; }
-    @media (max-width: 760px) { .incl { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 480px) { .incl { grid-template-columns: 1fr; } }
+    .printbtn { position: fixed; right: 22px; bottom: 86px; z-index: 55; width: 46px; height: 46px; min-width: 46px; padding: 0; border-radius: 50%; font-size: 1.1rem; line-height: 1; display: grid; place-items: center; box-shadow: 0 8px 22px rgba(0,0,0,.4); }
 
-    /* Cronograma */
-    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .tl { position: relative; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-    .tl::after { content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--cyan); font-weight: 800; }
-    .tl:last-child::after { display: none; }
-    .tl .w { font-family: "Orbitron",sans-serif; font-size: .68rem; letter-spacing: 1.4px; color: var(--cyan); text-transform: uppercase; }
-    .tl b { display: block; margin: 8px 0 4px; }
-    .tl p { color: var(--muted); font-size: .84rem; }
-    @media (max-width: 820px) { .timeline { grid-template-columns: 1fr 1fr; } .tl::after { display: none; } }
-    @media (max-width: 480px) { .timeline { grid-template-columns: 1fr; } }
+    /* ══ Launcher de demo integrado (probar en vivo desde la propuesta) ══ */
+    .launch-panel { background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+    .launch-panel h3 { font-size: 1.05rem; margin-bottom: 6px; }
+    .launch-panel .sub { color: var(--muted); font-size: .9rem; margin-bottom: 16px; }
+    .ttl { display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+    .ttl-ring { position: relative; width: 56px; height: 56px; flex: none; }
+    .ttl-ring svg { width: 56px; height: 56px; transform: rotate(-90deg); }
+    .ttl-ring circle { fill: none; stroke-width: 6; }
+    .ttl-bg { stroke: rgba(255,255,255,.08); }
+    .ttl-arc { stroke: var(--cyan); stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke .4s; }
+    .ttl-ring span { position: absolute; inset: 0; display: grid; place-items: center; font-family: monospace; font-weight: 700; font-size: .72rem; color: var(--text); }
+    .ttl.ending .ttl-arc { stroke: var(--danger); }
+    .ttl.ending .ttl-ring span { color: var(--danger); }
+    .creds { background: var(--panel); border: 1px dashed var(--border-strong); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; font-size: .9rem; }
+    .cred-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .cred-row code { color: var(--cyan); font-family: monospace; user-select: all; }
+    .cred-copy { flex: none; font-size: .74rem; font-weight: 700; color: #04121a; background: var(--grad); border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; transition: transform .12s, filter .2s; }
+    .cred-copy:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    .cred-copy.done { background: rgba(40,224,160,.18); color: var(--ok); border: 1px solid rgba(40,224,160,.5); }
+    .launch-actions { display: grid; gap: 10px; margin-top: 12px; }
+    .launch-note { font-size: .8rem; color: var(--muted-2); margin-top: 10px; }
+    .launch-err { font-size: .82rem; color: var(--danger); margin-top: 8px; display: none; }
 
-    /* Planes / continuidad en la nube */
-    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: stretch; }
-    .plan { position: relative; background: linear-gradient(165deg, var(--panel), var(--bg-alt)); border: 1px solid var(--border); border-radius: 18px; padding: 26px 24px; display: flex; flex-direction: column; }
-    .plan::after { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--grad); opacity: .55; }
-    .plan--feat { border-color: var(--border-strong); box-shadow: 0 0 0 1px rgba(34,211,238,.12), var(--shadow); }
-    .plan__tag { font-size: .66rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--cyan); font-weight: 700; }
-    .plan__name { font-family: "Orbitron",sans-serif; font-weight: 800; font-size: 1.1rem; margin-top: 4px; }
-    .plan__price { font-family: "Orbitron",sans-serif; font-weight: 800; font-size: 1.5rem; margin: 12px 0 2px; }
-    .plan__price .zero { color: var(--muted-2); } .plan__price small { font-size: .68rem; color: var(--muted); font-weight: 400; }
-    .plan ul { list-style: none; display: grid; gap: 8px; margin-top: 14px; }
-    .plan li { display: flex; gap: 9px; color: var(--muted); font-size: .9rem; } .plan li::before { content: "✓"; color: var(--ok); font-weight: 800; flex: none; }
-    @media (max-width: 820px) { .plans { grid-template-columns: 1fr; } }
+    /* Botón flotante persistente: probar demo mientras lee la cotización */
+    .demo-fab { position: fixed; left: 22px; bottom: 22px; z-index: 60; display: flex; align-items: center; gap: 10px; padding: 13px 20px; border-radius: 999px; font-weight: 800; font-size: .92rem; color: #04121a; background: var(--grad); border: 0; cursor: pointer; box-shadow: 0 12px 30px rgba(34,211,238,.35); transition: transform .15s, box-shadow .2s; }
+    .demo-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 38px rgba(34,211,238,.45); }
+    .demo-fab.active { background: rgba(40,224,160,.18); color: var(--ok); border: 1px solid rgba(40,224,160,.5); box-shadow: 0 12px 30px rgba(40,224,160,.3); }
+    .demo-fab .dot { width: 8px; height: 8px; border-radius: 50%; background: #04121a; }
 
-    /* Qué NO incluye */
-    .noinc { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 24px; }
-    .noinc div { display: flex; gap: 10px; color: var(--muted); font-size: .92rem; } .noinc div::before { content: "✕"; color: var(--danger); font-weight: 800; flex: none; }
-    @media (max-width: 620px) { .noinc { grid-template-columns: 1fr; } }
+    /* Modal del launcher */
+    .modal-bg { position: fixed; inset: 0; background: rgba(4,8,16,.78); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 100; padding: 20px; }
+    .modal-bg.hidden { display: none; }
+    .modal { width: min(440px, 100%); background: var(--bg); border: 1px solid var(--border-strong); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; }
+    .modal__head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+    .modal__head b { font-family: "Orbitron",sans-serif; font-size: .82rem; letter-spacing: 1px; color: var(--cyan); }
+    .modal__close { background: none; border: 0; color: var(--muted-2); font-size: 1.3rem; cursor: pointer; line-height: 1; }
+    .modal__close:hover { color: var(--text); }
+    .modal__body { padding: 22px; }
 
-    /* Por qué VISIONYX */
-    .whyvx { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    @media (max-width: 820px) { .whyvx { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 520px) { .whyvx { grid-template-columns: 1fr; } }
-
-    /* Acordeón de detalle técnico (inversión) */
-    .acc { margin: 20px 0 4px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); overflow: hidden; }
-    .acc > summary { cursor: pointer; list-style: none; padding: 15px 20px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
-    .acc > summary::-webkit-details-marker { display: none; }
-    .acc > summary::before { content: "▸"; color: var(--cyan); transition: transform .2s; }
-    .acc[open] > summary::before { transform: rotate(90deg); }
-    .acc__body { padding: 4px 18px 18px; }
-
-    .printbtn { position: fixed; right: 22px; bottom: 22px; z-index: 60; }
     @media print {
       .nav, .printbtn, .wa-float { display: none !important; }
       body { background: #fff; }
@@ -330,12 +338,12 @@
       .sc-door, .sc-fig, .sc-reticle, .sc-scanline, .sc-verdict, .sc-led, .sc-mag { animation: none; }
     }
     @media (max-width: 920px) {
-      .cover__grid, .demo-cta__inner, .exec__grid { grid-template-columns: 1fr; gap: 30px; }
-      .benefits, .flow, .terms, .steps4, .arch, .shots, .scale { grid-template-columns: 1fr 1fr; }
-      .options, .safe, .callouts, .firma, .roi, .hs, .inv-sum, .why { grid-template-columns: 1fr; }
+      .cover__grid, .demo-cta__inner, .exec__grid, .annex__cols { grid-template-columns: 1fr; gap: 30px; }
+      .benefits, .flow, .terms, .steps4, .arch, .shots, .caps, .roadmap, .failgrid { grid-template-columns: 1fr 1fr; }
+      .options, .safe, .callouts, .firma, .roi, .diff { grid-template-columns: 1fr; }
       .flow__step::after { content: "↓"; right: 50%; top: auto; bottom: -16px; transform: translateX(50%); }
     }
-    @media (max-width: 560px) { .benefits, .flow, .terms, .steps4, .arch, .shots, .scale { grid-template-columns: 1fr; } .cmp { font-size: .8rem; } .cmp th, .cmp td { padding: 9px 8px; } }
+    @media (max-width: 560px) { .benefits, .flow, .terms, .steps4, .arch, .shots, .caps, .roadmap, .failgrid, .inv-sum { grid-template-columns: 1fr; } .cmp { font-size: .8rem; } .cmp th, .cmp td { padding: 9px 8px; } }
   </style>
 </head>
 <body>
@@ -349,9 +357,9 @@
       </a>
       <nav class="nav__links" aria-label="Principal">
         <a href="#resumen">Resumen</a>
-        <a href="#montaje">Montaje</a>
+        <a href="#plataforma">Plataforma</a>
         <a href="#opciones">Opciones</a>
-        <a href="#inversion">Inversión</a>
+        <a href="#inversion">Planes</a>
         <a href="demo.html" class="btn btn--primary btn--sm">▶ Probar Access</a>
       </nav>
       <button class="nav__toggle" aria-label="Menú" aria-expanded="false">☰</button>
@@ -364,26 +372,27 @@
     <div class="hero__glow" aria-hidden="true"></div>
     <div class="container" style="position:relative;z-index:1">
       <div class="cover__head">
-        <span class="prop-tag"><span class="pulse"></span> Propuesta · Control de acceso facial</span>
+        <span class="prop-tag"><span class="pulse"></span> Propuesta · Plataforma de Identidad y Acceso</span>
         <div class="cover__conf">Documento confidencial<br />Propuesta comercial · 2026</div>
       </div>
 
       <div class="cover__grid">
         <div>
-          <p class="eyebrow">VISIONYX Access · Una puerta · Manos libres</p>
+          <p class="eyebrow">VISIONYX Access · Identidad física · Manos libres</p>
           <h1>Que el <span class="accent">rostro</span> sea la llave.<br />Que <span class="accent-2">nadie</span> espere afuera.</h1>
           <p class="lead">
-            Su equipo no debería depender de una llave física ni de que alguien
-            llegue temprano para abrir. Con <strong>VISIONYX Access</strong>, cada
-            empleado autorizado entra con su rostro —<strong>a cualquier hora</strong>—
-            y la puerta se vuelve a bloquear sola al cerrarse.
+            <strong>VISIONYX Access</strong> es una plataforma de identidad física:
+            cada empleado autorizado entra con su rostro —<strong>a cualquier hora</strong>—,
+            la puerta se vuelve a bloquear sola al cerrarse, y cada entrada queda
+            <strong>registrada y auditable</strong>. No es una cerradura inteligente: es la
+            capa de identidad que convierte una puerta en un sistema.
           </p>
           <div class="hero__cta">
             <a href="demo.html" class="btn btn--primary">▶ Probar Access en vivo</a>
-            <a href="#opciones" class="btn btn--ghost">Ver las dos opciones</a>
+            <a href="#plataforma" class="btn btn--ghost">Ver la plataforma</a>
           </div>
           <div class="cover__meta">
-            <div><div class="l">Presentado a</div><div class="v">INP S.A.S.<small>Mall Palms Avenue · Of. 9745 · Medellín — puerta corrediza</small></div></div>
+            <div><div class="l">Presentado a</div><div class="v">INP Ingeniería y Arquitectura<small>Control de acceso · puerta corrediza de vidrio</small></div></div>
             <div><div class="l">Presentado por</div><div class="v">VISIONYX<small>Ingeniería de software · Medellín, Colombia</small></div></div>
           </div>
         </div>
@@ -421,18 +430,18 @@
           <div>
             <p class="kicker">Resumen ejecutivo</p>
             <h2 class="section__title" style="max-width:none">En una frase, y luego los detalles</h2>
-            <p><strong>VISIONYX Access reemplaza las llaves físicas por reconocimiento facial con prueba de vida.</strong> Cualquier empleado autorizado abre la puerta con su rostro, a cualquier hora, sin depender de terceros ni de horarios.</p>
+            <p><strong>VISIONYX Access sustituye llaves, tarjetas y porteros por identidad biométrica verificable.</strong> Cualquier empleado autorizado abre con su rostro, a cualquier hora; cada entrada queda registrada; y una foto o una pantalla <em>no</em> abren la puerta.</p>
             <ul>
-              <li>Acceso autónomo 24/7, sin llaves ni porteros</li>
-              <li>Registro automático y auditable de cada entrada</li>
-              <li>Anti-suplantación: una foto o un video no abren</li>
-              <li>Instalación a la medida de la puerta corrediza actual</li>
-              <li>Software 100% propio, operación local y privada</li>
+              <li>Acceso autónomo 24/7, sin llaves que se pierdan ni tarjetas que se presten</li>
+              <li>Identidad verificada con prueba de vida activa y pasiva (anti-suplantación)</li>
+              <li>Registro automático y auditable de cada intento: quién, cuándo y resultado</li>
+              <li>Altas y bajas de personal en segundos, sin reemplazar cerraduras</li>
+              <li>Software 100% propio, con inferencia local y privacidad por diseño</li>
             </ul>
           </div>
           <div class="exec__facts">
-            <div class="exec__fact"><div class="l">Implementación</div><div class="v">~5 días hábiles</div><p>Desde el anticipo hasta la puesta en marcha.</p></div>
-            <div class="exec__fact"><div class="l">Inversión (Opción A)</div><div class="v zero">COP $—</div><p>Hardware + instalación + software, a confirmar.</p></div>
+            <div class="exec__fact"><div class="l">Implementación</div><div class="v">10–14 días</div><p>Desde el anticipo hasta la puesta en marcha (algunos equipos se importan).</p></div>
+            <div class="exec__fact"><div class="l">Desde</div><div class="v">COP $19 M</div><p>Plan Essential, todo incluido. Professional en $23 M.</p></div>
             <div class="exec__fact"><div class="l">Decisión</div><div class="v">Pruébelo hoy</div><p>Demo en vivo antes de comprometer un peso.</p></div>
           </div>
         </div>
@@ -445,12 +454,12 @@
     <div class="container">
       <p class="kicker">El problema de hoy</p>
       <h2 class="section__title">Toda la oficina depende de una sola llave</h2>
-      <p class="section__sub">Y de que la persona que la tiene llegue a tiempo. Cuando no llega, el equipo entero se detiene en la puerta.</p>
+      <p class="section__sub">Y de que la persona que la tiene llegue a tiempo. Cuando no llega, el equipo entero se detiene en la puerta. Y aunque hubiera más copias, una llave no registra quién entró ni a qué hora.</p>
       <div class="pain">
         <div class="pain__row"><span class="ic">🔑</span><div><b>Pocas llaves, muchas personas.</b><p>Solo unos pocos pueden abrir; el resto depende de ellos cada mañana.</p></div></div>
         <div class="pain__row"><span class="ic">🚦</span><div><b>El encargado llega tarde por el tráfico.</b><p>Un trancón a primera hora deja al equipo completo afuera, sin poder empezar a trabajar.</p></div></div>
         <div class="pain__row"><span class="ic">⏳</span><div><b>O, sencillamente, no llega.</b><p>Una incapacidad o un imprevisto, y nadie más tiene cómo abrir. Horas perdidas.</p></div></div>
-        <div class="pain__row"><span class="ic">😤</span><div><b>Gente esperando en un sótano.</b><p>Empleados de pie junto a los parqueaderos esperando una llave. Mala imagen y peor ánimo.</p></div></div>
+        <div class="pain__row"><span class="ic">🧾</span><div><b>Sin trazabilidad, sin control.</b><p>Una llave prestada o copiada abre sin dejar rastro. Si alguien sale de la empresa, hay que cambiar la guarda.</p></div></div>
       </div>
       <p class="pain__punch">El costo no es la cerradura.<br /><span class="accent">Es cada hora que su equipo pasa esperando para empezar a trabajar.</span></p>
     </div>
@@ -461,7 +470,7 @@
     <div class="container">
       <p class="kicker">El costo de no resolverlo</p>
       <h2 class="section__title">Hagamos la cuenta de lo que cuesta esperar</h2>
-      <p class="section__sub">Cifras de ejemplo, ajustables a su realidad. La idea es simple: el tiempo detenido cuesta más que la solución.</p>
+      <p class="section__sub">Cifras de referencia, ajustables a su realidad en la visita técnica. La idea es simple: el tiempo detenido cuesta más que la solución.</p>
       <div class="roi">
         <div class="roi__calc">
           <div class="roi__line">Empleados que esperan por evento <b>8</b></div>
@@ -479,18 +488,84 @@
         <div class="roi__flip">
           <h3>De “qué solución tan bonita” a “necesitamos resolver esto”</h3>
           <p>Y esto solo cuenta el tiempo. No incluye la <span class="em">frustración del equipo</span>, la <span class="em">mala imagen</span> ante clientes que llegan, ni el <span class="em">riesgo</span> de una llave perdida o copiada.</p>
-          <p style="margin-top:12px">VISIONYX Access es una inversión única que <span class="em">elimina el problema de raíz</span>, no un gasto recurrente.</p>
+          <p style="margin-top:12px">VISIONYX Access es una inversión que <span class="em">elimina el problema de raíz</span> y, además, le entrega la trazabilidad que hoy no tiene.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ══ SOLUCIÓN ══ -->
-  <section class="section">
+  <!-- ══ PLATAFORMA: lo que adquiere ══ -->
+  <section id="plataforma" class="section">
     <div class="container">
-      <p class="kicker">La solución</p>
+      <p class="kicker">La plataforma</p>
+      <h2 class="section__title">No es una cerradura. Es una capa de identidad.</h2>
+      <p class="section__sub">El hardware es solo el cuerpo, y se compra una vez. El valor real —lo que convierte una puerta en un sistema que decide, registra y evoluciona— es el software de VISIONYX Access. Estas son las capacidades que ya están construidas y demostrables en vivo.</p>
+
+      <div class="caps">
+        <div class="cap">
+          <h3><span class="ic">⊚</span> Identidad biométrica</h3>
+          <ul>
+            <li>Reconocimiento facial 1:N (uno entre muchos)</li>
+            <li>Prueba de vida <b>activa</b> (reto-respuesta anti-foto)</li>
+            <li>Prueba de vida <b>pasiva</b> (detección de impresión/pantalla)</li>
+            <li>Inferencia local: los rostros no salen de la oficina</li>
+          </ul>
+        </div>
+        <div class="cap">
+          <h3><span class="ic">👤</span> Gestión de identidades</h3>
+          <ul>
+            <li>Registro guiado de rostros desde la consola</li>
+            <li>Consentimiento biométrico (Ley 1581) registrado</li>
+            <li>Altas, bajas y desactivación en segundos</li>
+            <li>Autorizaciones por punto de acceso</li>
+          </ul>
+        </div>
+        <div class="cap">
+          <h3><span class="ic">≣</span> Auditoría y trazabilidad</h3>
+          <ul>
+            <li>Bitácora de cada intento: quién, cuándo, resultado</li>
+            <li>Eventos CONCEDIDO / DENEGADO con scores</li>
+            <li>Apertura manual del operador registrada</li>
+            <li>Historial consultable y exportable</li>
+          </ul>
+        </div>
+        <div class="cap">
+          <h3><span class="ic">🚪</span> Control de puerta</h3>
+          <ul>
+            <li>Política de decisión <b>fail-secure</b> de extremo a extremo</li>
+            <li>Kiosko de puerta con veredicto en vivo</li>
+            <li>Re-bloqueo automático al cerrar (en el firmware)</li>
+            <li>Apertura por relé / controlador (ESP32) o HTTP</li>
+          </ul>
+        </div>
+        <div class="cap">
+          <h3><span class="ic">🛡️</span> Privacidad por diseño</h3>
+          <ul>
+            <li>Plantillas biométricas, no imágenes en bruto</li>
+            <li>Metadatos separados de la biometría</li>
+            <li>Operación local, sin nube de terceros obligatoria</li>
+            <li>Revocación y borrado de plantilla al retirar personal</li>
+          </ul>
+        </div>
+        <div class="cap">
+          <h3><span class="ic">🖥️</span> Administración</h3>
+          <ul>
+            <li>Consola web: cámaras, puntos, empleados, eventos</li>
+            <li>Monitoreo de salud del servicio de visión</li>
+            <li>Configuración de umbrales por punto</li>
+            <li>Multi-cámara y multi-punto en el mismo despliegue</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ BENEFICIOS ══ -->
+  <section class="section section--alt">
+    <div class="container">
+      <p class="kicker">Qué cambia</p>
       <h2 class="section__title">Cada empleado es su propia llave, 24/7</h2>
-      <p class="section__sub">VISIONYX Access reemplaza la llave por el rostro: sin tarjetas que se pierden, sin claves que se comparten, sin esperar a nadie.</p>
+      <p class="section__sub">VISIONYX Access reemplaza la llave por el rostro: sin tarjetas que se pierden, sin claves que se comparten, sin esperar a nadie —y con evidencia de cada acceso.</p>
       <div class="benefits">
         <div class="benefit"><div class="big">24/7</div><h3>Entra a cualquier hora</h3><p>El primero en llegar abre con su cara. Ya nadie necesita la llave.</p></div>
         <div class="benefit"><div class="big">~2 s</div><h3>Reconocimiento instantáneo</h3><p>Se ubica frente a la puerta, el sistema lo reconoce con prueba de vida y abre. Manos libres.</p></div>
@@ -503,11 +578,11 @@
   </section>
 
   <!-- ══ COMPARATIVO ══ -->
-  <section class="section section--alt">
+  <section class="section">
     <div class="container">
       <p class="kicker">¿Por qué no una llave o una tarjeta?</p>
       <h2 class="section__title">Lo mismo que ya conoce, pero sin sus problemas</h2>
-      <p class="section__sub">Un lector de tarjetas RFID resuelve la mitad del problema y crea otros nuevos. El rostro no se presta, no se copia y no se pierde.</p>
+      <p class="section__sub">Un lector de tarjetas RFID resuelve la mitad del problema y crea otros nuevos. El rostro no se presta, no se copia y no se pierde —y deja evidencia de cada acceso.</p>
       <table class="cmp">
         <thead>
           <tr><th>Característica</th><th>Llave física</th><th>Tarjeta RFID</th><th class="win">VISIONYX Access</th></tr>
@@ -526,34 +601,63 @@
   </section>
 
   <!-- ══ DEMO EN VIVO ══ -->
-  <section class="section">
+  <section class="section section--alt">
     <div class="container">
       <div class="demo-cta">
         <div class="demo-cta__inner">
           <div>
             <p class="kicker">No nos crea · compruébelo</p>
-            <h2 class="section__title">Pruébelo usted mismo, antes de decidir.</h2>
+            <h2 class="section__title">Pruébelo aquí mismo, mientras lee la cotización.</h2>
             <p class="section__sub" style="margin-bottom:22px">
               No es un video ni una promesa: es el <strong>software real de VISIONYX
-              Access</strong> corriendo en nuestro servidor. Registre su rostro desde
-              el celular o el computador y ábrale la puerta con reconocimiento facial
-              y prueba de vida de verdad. <strong>Mientras deciden, ya lo están usando.</strong>
+              Access</strong> corriendo en nuestro servidor. Genere su acceso privado
+              <strong>sin salir de esta página</strong>, registre su rostro y ábrale
+              la puerta con reconocimiento facial y prueba de vida de verdad.
             </p>
             <ul class="livedemo__steps">
-              <li><span>1</span> Genere su acceso privado en un clic</li>
-              <li><span>2</span> Registre su rostro (gire y parpadee)</li>
-              <li><span>3</span> El kiosko lo reconoce y “abre la puerta”</li>
+              <li><span>1</span> Pulse <b>“Generar mi acceso”</b>: obtiene su sesión aislada</li>
+              <li><span>2</span> Abra el kiosko y registre su rostro (gire y parpadee)</li>
+              <li><span>3</span> El sistema lo reconoce de verdad y “abre la puerta”</li>
             </ul>
             <div class="livedemo__privacy">
-              🛡️ <div><b>Sesión privada y aislada.</b> Nadie ve sus datos. Todo —incluido su rostro— se <b>elimina solo del servidor en 1 hora</b>.</div>
+              🛡️ <div><b>Sesión privada y aislada.</b> Nadie ve sus datos. Todo —incluido su rostro— se <b>elimina solo del servidor en 1 hora</b>. No use datos de terceros sin su permiso.</div>
             </div>
-            <div class="livedemo__privacy" style="border-color:rgba(34,211,238,.30);background:rgba(34,211,238,.06)">
-              💻 <div><b>Para la mejor experiencia</b> pruébelo desde un <b>computador con cámara</b> (webcam integrada o USB). También funciona desde el celular: ahí la cámara frontal rinde mejor en buena luz.</div>
+
+            <!-- Launcher integrado -->
+            <div class="launch-panel" id="launch-panel" style="margin-top:22px">
+              <h3>🔑 Su acceso de prueba privado</h3>
+              <p class="sub" id="launch-sub">Un clic y entra al sistema real. Sesión aislada que se autodestruye en 60 minutos.</p>
+
+              <!-- Estado: generar -->
+              <div id="gen-state">
+                <button id="btn-gen" class="btn btn--primary" style="width:100%">⚡ Generar mi acceso de prueba</button>
+                <p class="launch-err" id="gen-err"></p>
+              </div>
+
+              <!-- Estado: sesión activa -->
+              <div id="live-state" style="display:none">
+                <div class="ttl" id="ttl-box">
+                  <div class="ttl-ring" aria-hidden="true">
+                    <svg viewBox="0 0 56 56"><circle class="ttl-bg" cx="28" cy="28" r="24"/><circle id="ttl-arc" class="ttl-arc" cx="28" cy="28" r="24"/></svg>
+                    <span id="ttl-clock">60:00</span>
+                  </div>
+                  <div>
+                    <b style="color:var(--ok)">Sesión activa</b>
+                    <div id="ttl-sub" style="color:var(--muted);font-size:.82rem">Se autodestruye en 60 minutos.</div>
+                  </div>
+                </div>
+                <div class="creds">
+                  <div class="cred-row"><span>Usuario: <code id="cred-user">—</code></span><button class="cred-copy" data-copy-target="cred-user">Copiar</button></div>
+                  <div class="cred-row"><span>Clave: <code id="cred-pass">—</code></span><button class="cred-copy" data-copy-target="cred-pass">Copiar</button></div>
+                </div>
+                <div class="launch-actions">
+                  <a id="lnk-admin" class="btn btn--primary" href="#" target="_blank" rel="noopener">Abrir consola de administración →</a>
+                  <a id="lnk-kiosk" class="btn btn--ghost" href="#" target="_blank" rel="noopener">Abrir kiosko de puerta →</a>
+                </div>
+                <p class="launch-note">🔒 El reconocimiento usa su cámara (HTTPS). Permita el acceso cuando el navegador lo pida. <b>Puede seguir leyendo la cotización</b>: su sesión sigue corriendo.</p>
+              </div>
             </div>
-            <div class="hero__cta">
-              <a href="demo.html" class="btn btn--primary">▶ Probar Access en vivo</a>
-              <a href="https://demo.visionyx.lat/kiosk/" target="_blank" rel="noopener" class="btn btn--ghost">Abrir el kiosko</a>
-            </div>
+
           </div>
           <div class="livedemo__visual" aria-hidden="true">
             <div class="scancard">
@@ -582,11 +686,11 @@
   </section>
 
   <!-- ══ CÓMO FUNCIONA ══ -->
-  <section class="section section--alt">
+  <section class="section">
     <div class="container">
       <p class="kicker">Cómo funciona</p>
       <h2 class="section__title">Tecnología que decide bien, siempre</h2>
-      <p class="section__sub">Arquitectura <strong>fail-secure</strong>: ningún camino degradado abre la puerta. La cámara observa, el sistema decide, y la cerradura solo se libera si la decisión es <em>CONCEDIDO</em>.</p>
+      <p class="section__sub">El reconocimiento ocurre en el equipo de la oficina; el sistema decide con una política estricta; y la cerradura solo se libera si la decisión es <em>CONCEDIDO</em>. Ningún camino degradado abre la puerta.</p>
       <div class="flow">
         <div class="flow__step"><div class="n">01</div><b>Captura</b><span>Cámara IP o tablet ve el rostro al acercarse</span></div>
         <div class="flow__step"><div class="n">02</div><b>Visión IA</b><span>Reconoce + prueba de vida en el equipo local</span></div>
@@ -594,42 +698,58 @@
         <div class="flow__step"><div class="n">04</div><b>Apertura</b><span>El controlador libera la cerradura magnética</span></div>
         <div class="flow__step"><div class="n">05</div><b>Re-bloqueo</b><span>Al cerrar la puerta, vuelve a bloquearse sola</span></div>
       </div>
-      <div class="flow__note">🔒 <b>Fail-secure de extremo a extremo.</b> Identidad desconocida, prueba de vida baja o sin autorización ⇒ la puerta <b>no</b> abre. Y si se va la luz, la cerradura queda <b>liberada</b>: nadie queda encerrado ni afuera.</div>
     </div>
   </section>
 
-  <!-- ══ LO QUE REALMENTE ADQUIERE: HARDWARE vs SOFTWARE ══ -->
+  <!-- ══ FAIL-SECURE / FAIL-SAFE (corrección conceptual) ══ -->
+  <section class="section section--alt">
+    <div class="container">
+      <p class="kicker">Seguridad y evacuación</p>
+      <h2 class="section__title">Una puerta segura es, primero, una salida segura</h2>
+      <p class="section__sub">Aplicamos dos principios distintos y complementarios. La <strong>decisión</strong> es <em>fail-secure</em> (ante la duda, no abre). La <strong>cerradura</strong> es <em>fail-safe</em> (sin energía, libera). Así protegemos la entrada sin poner en riesgo el egreso.</p>
+
+      <div class="failgrid">
+        <div class="failcard sec">
+          <span class="tag">DECISIÓN · FAIL-SECURE</span>
+          <h3>Ante cualquier duda, la puerta <u>no</u> abre</h3>
+          <p class="one-liner">La seguridad es la opción por defecto del software.</p>
+          <ul>
+            <li>Liveness bajo ⇒ DENEGADO</li>
+            <li>Identidad desconocida ⇒ DENEGADO</li>
+            <li>Sin consentimiento o sin autorización ⇒ DENEGADO</li>
+            <li>El sistema de visión infiere; el backend decide; el actuador solo abre si es CONCEDIDO</li>
+          </ul>
+        </div>
+        <div class="failcard safe">
+          <span class="tag">CERRADURA · FAIL-SAFE</span>
+          <h3>Si se va la luz, nadie queda encerrado</h3>
+          <p class="one-liner">El egreso es siempre libre e inmediato.</p>
+          <ul>
+            <li>Cerradura fail-safe: sin energía = puerta liberada</li>
+            <li>Botón/sensor de salida (REX): salir sin reconocer nada</li>
+            <li>Preparada para corte por central de incendios</li>
+            <li>El Face ID controla solo la <b>entrada</b>, nunca la salida</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow__note" style="margin-top:18px">⚖️ <b>Doble garantía.</b> En la <b>entrada</b>, el sistema niega por defecto (fail-secure). En la <b>salida</b>, la puerta libera por defecto (fail-safe). Seguridad y evacuación no compiten: se diseñan por separado.</div>
+    </div>
+  </section>
+
+  <!-- ══ DIFERENCIADORES ══ -->
   <section class="section">
     <div class="container">
-      <p class="kicker">Lo que realmente adquiere</p>
-      <h2 class="section__title">No es una cerradura. Es una plataforma de acceso.</h2>
-      <p class="section__sub">El hardware es solo el cuerpo. El valor real —y lo que hace a VISIONYX Access seguro, auditable y actualizable— es el software propio que lo opera.</p>
-      <div class="hs">
-        <div class="hs__card">
-          <span class="hs__tag">El cuerpo</span>
-          <h3>🔧 Hardware</h3>
-          <ul class="hs__list">
-            <li><b>Cerradura magnética</b> fail-safe de alta retención + soporte en U</li>
-            <li><b>Tablet o cámara IP</b> de captura en la entrada</li>
-            <li><b>Mini servidor</b> (headless, 24/7) que corre todo dentro de la oficina</li>
-            <li><b>Monitor + teclado/mouse + cámara USB</b> para administrar y registrar</li>
-            <li><b>Controlador</b> ESP32 + relé + fuente, botón REX y sensor de puerta</li>
-            <li><b>Switch de red, UPS, perfil y materiales</b> para una instalación firme</li>
-          </ul>
-        </div>
-        <div class="hs__card is-soft">
-          <span class="hs__tag">El cerebro · el verdadero producto</span>
-          <h3>🧠 Software VISIONYX Access</h3>
-          <ul class="hs__list">
-            <li><b>Motor biométrico</b> con reconocimiento facial 1:N</li>
-            <li><b>Prueba de vida</b> activa y pasiva (anti-suplantación)</li>
-            <li><b>Gestión de empleados</b>: altas, bajas y permisos en segundos</li>
-            <li><b>Registro de eventos</b> auditable: quién, cuándo y resultado</li>
-            <li><b>Consola de administración</b> y kiosko de puerta</li>
-            <li><b>Actualizaciones</b> y mejoras continuas del sistema</li>
-          </ul>
-          <div class="hs__note">💡 <b>El hardware se compra una vez; el software es lo que convierte una puerta en un sistema</b> que registra, decide y evoluciona.</div>
-        </div>
+      <p class="kicker">Por qué VISIONYX</p>
+      <h2 class="section__title">Lo que pocos proveedores locales pueden igualar</h2>
+      <p class="section__sub">No revendemos una caja negra de terceros. Construimos la plataforma de extremo a extremo —visión, backend, firmware y consola— con criterio de ingeniería y seguridad.</p>
+      <div class="diff">
+        <div class="diff__card"><h3><span class="ic">⬚</span> Plataforma 100% propia</h3><p>Desarrollamos el motor de visión, el backend, el firmware y la consola. Sin depender de cajas negras de terceros: control y evolución totales.</p></div>
+        <div class="diff__card"><h3><span class="ic">⊟</span> Sin licencias por usuario</h3><p>El uso del sistema no cobra por cada empleado. La licencia es por punto de acceso, no por persona.</p></div>
+        <div class="diff__card"><h3><span class="ic">⊚</span> Inferencia local</h3><p>El reconocimiento corre en el equipo de la oficina. Abrir la puerta no depende de internet ni de una nube externa.</p></div>
+        <div class="diff__card"><h3><span class="ic">§</span> Arquitectura abierta</h3><p>Estándares (RTSP/ONVIF, HTTP, REST) e integrable con su relé, su cámara o su sistema de seguridad existente.</p></div>
+        <div class="diff__card"><h3><span class="ic">⛨</span> Seguridad ISO 27001</h3><p>Criterio de auditoría en cada decisión: consentimiento, cifrado, separación de datos, logs inalterables.</p></div>
+        <div class="diff__card"><h3><span class="ic">◉</span> Hecho en Colombia</h3><p>Desarrollado y soportado en Medellín. Respuesta local, sin depended de proveedor en el extranjero.</p></div>
       </div>
     </div>
   </section>
@@ -639,27 +759,15 @@
     <div class="container">
       <p class="kicker">Credibilidad técnica</p>
       <h2 class="section__title">Construido con criterio de ingeniería, no improvisado</h2>
-      <p class="section__sub">VISIONYX Access aplica los mismos principios de seguridad que usamos en sistemas de misión crítica. Así fluye una apertura, de extremo a extremo:</p>
-
-      <div class="archflow" style="margin-bottom:18px">
-        <div class="archflow__node"><div class="ic">🧑</div><b>Empleado</b><small>se acerca a la puerta</small></div>
-        <div class="archflow__node"><div class="ic">📱</div><b>Tablet / Cámara</b><small>captura el rostro</small></div>
-        <div class="archflow__node is-core"><div class="ic">▦</div><b>VISIONYX Access</b><small>decide (fail-secure)</small></div>
-        <div class="archflow__node"><div class="ic">🧠</div><b>Motor biométrico</b><small>match + prueba de vida</small></div>
-        <div class="archflow__node"><div class="ic">🗄️</div><b>Base de datos local</b><small>identidades y eventos</small></div>
-        <div class="archflow__node"><div class="ic">🎛️</div><b>Controlador</b><small>libera la cerradura</small></div>
-        <div class="archflow__node"><div class="ic">🚪</div><b>Puerta</b><small>abre y re-bloquea sola</small></div>
-      </div>
-      <div class="flow__note" style="margin-bottom:26px">🔒 <b>Todo corre dentro de la oficina.</b> El motor biométrico, la base de datos y la decisión viven en el mini servidor local — no dependen de internet para abrir la puerta.</div>
-
+      <p class="section__sub">VISIONYX Access aplica los mismos principios de seguridad que usamos en sistemas de misión crítica.</p>
       <div class="arch">
         <div class="arch__item"><div class="ic">▤</div><b>Backend local</b><p>Todo opera dentro de la oficina; no dependemos de internet para abrir.</p></div>
-        <div class="arch__item"><div class="ic">⛨</div><b>Datos cifrados</b><p>Plantillas biométricas protegidas; metadatos separados de los rostros.</p></div>
+        <div class="arch__item"><div class="ic">⛨</div><b>Datos protegidos</b><p>Plantillas biométricas separadas de los metadatos; no almacenamos rostros en bruto.</p></div>
         <div class="arch__item"><div class="ic">≣</div><b>Logs auditables</b><p>Cada decisión queda registrada de forma inalterable para auditoría.</p></div>
-        <div class="arch__item"><div class="ic">⊚</div><b>Prueba de vida</b><p>Reconocimiento con anti-spoofing: no basta una foto o una pantalla.</p></div>
-        <div class="arch__item"><div class="ic">🔒</div><b>Fail-secure</b><p>Ningún camino degradado abre la puerta. La seguridad es la opción por defecto.</p></div>
+        <div class="arch__item"><div class="ic">⊚</div><b>Prueba de vida</b><p>Reconocimiento con anti-spoofing activo y pasivo: no basta una foto o una pantalla.</p></div>
+        <div class="arch__item"><div class="ic">🔒</div><b>Decisión fail-secure</b><p>Ningún camino degradado abre la puerta. La seguridad es la opción por defecto.</p></div>
+        <div class="arch__item"><div class="ic">🚪</div><b>Cerradura fail-safe</b><p>Si se va la luz, la puerta libera: nadie queda encerrado ni afuera.</p></div>
         <div class="arch__item"><div class="ic">◷</div><b>Respaldo UPS</b><p>El sistema sigue reconociendo ante microcortes de energía.</p></div>
-        <div class="arch__item"><div class="ic">⬡</div><b>Operación offline</b><p>Funciona aunque se caiga el internet del edificio.</p></div>
         <div class="arch__item"><div class="ic">⊕</div><b>Cumplimiento</b><p>Tratamiento de datos conforme a la Ley 1581, con consentimiento.</p></div>
       </div>
     </div>
@@ -670,36 +778,18 @@
     <div class="container">
       <p class="kicker">El sistema por dentro</p>
       <h2 class="section__title">Así se administra el acceso, día a día</h2>
-      <p class="section__sub">No son maquetas: es la <strong>misma consola</strong> que opera el sistema y que usted puede recorrer en el <a href="demo.html" style="color:var(--cyan)">demo en vivo</a>. Aquí se gestionan empleados, se ve quién entra y se audita todo.</p>
+      <p class="section__sub">Una consola simple para gestionar empleados, ver quién entra y registrar rostros. (Vistas ilustrativas del producto real.)</p>
       <div class="shots">
-        <!-- Inicio / Dashboard -->
+        <!-- Eventos en vivo -->
         <div class="shot">
-          <div class="shot__bar"><i></i><i></i><i></i><span>VISIONYX Access · Inicio</span></div>
+          <div class="shot__bar"><i></i><i></i><i></i><span>VISIONYX Access · Eventos</span></div>
           <div class="shot__body">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:10px;padding:11px 13px"><div style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.5rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">18</div><div style="font-size:.72rem;color:var(--muted)">Empleados</div></div>
-              <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:10px;padding:11px 13px"><div style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.5rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">1</div><div style="font-size:.72rem;color:var(--muted)">Puerta de acceso</div></div>
-              <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:10px;padding:11px 13px"><div style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.5rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">1</div><div style="font-size:.72rem;color:var(--muted)">Cámara / Tablet</div></div>
-              <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:10px;padding:11px 13px"><div style="font-weight:800;font-size:1rem;color:var(--ok);display:flex;align-items:center;gap:7px"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span>En línea</div><div style="font-size:.72rem;color:var(--muted);margin-top:6px">Estado del sistema</div></div>
-            </div>
+            <div class="ev"><span class="ev__av">JC</span><div class="ev__who"><b>Juan Carlos R.</b><small>Hoy · 7:02 a. m.</small></div><span class="chip chip--ok">CONCEDIDO</span></div>
+            <div class="ev"><span class="ev__av">ML</span><div class="ev__who"><b>María L.</b><small>Hoy · 7:14 a. m.</small></div><span class="chip chip--ok">CONCEDIDO</span></div>
+            <div class="ev"><span class="ev__av">?</span><div class="ev__who"><b>Rostro desconocido</b><small>Hoy · 7:21 a. m.</small></div><span class="chip chip--no">DENEGADO</span></div>
+            <div class="ev"><span class="ev__av">DA</span><div class="ev__who"><b>Diana A.</b><small>Hoy · 7:35 a. m.</small></div><span class="chip chip--ok">CONCEDIDO</span></div>
           </div>
-          <div class="shot__cap">Resumen en vivo: empleados, puertas y estado del sistema.</div>
-        </div>
-        <!-- Bitácora de auditoría -->
-        <div class="shot">
-          <div class="shot__bar"><i></i><i></i><i></i><span>VISIONYX Access · Auditoría</span></div>
-          <div class="shot__body" style="padding:12px 14px">
-            <table style="width:100%;border-collapse:collapse;font-size:.76rem">
-              <thead><tr style="color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;font-size:.62rem"><th style="text-align:left;padding:4px 2px;font-weight:700">Hora</th><th style="text-align:left;font-weight:700">Quién</th><th style="text-align:right;font-weight:700">Decisión</th></tr></thead>
-              <tbody style="color:var(--text)">
-                <tr><td style="padding:6px 2px;border-top:1px solid var(--border)">7:02</td><td style="border-top:1px solid var(--border)">Juan Carlos R.</td><td style="text-align:right;border-top:1px solid var(--border)"><span class="chip chip--ok">✔</span></td></tr>
-                <tr><td style="padding:6px 2px;border-top:1px solid var(--border)">7:14</td><td style="border-top:1px solid var(--border)">María L.</td><td style="text-align:right;border-top:1px solid var(--border)"><span class="chip chip--ok">✔</span></td></tr>
-                <tr><td style="padding:6px 2px;border-top:1px solid var(--border)">7:21</td><td style="border-top:1px solid var(--border)">Desconocido</td><td style="text-align:right;border-top:1px solid var(--border)"><span class="chip chip--no">✕</span></td></tr>
-                <tr><td style="padding:6px 2px;border-top:1px solid var(--border)">7:35</td><td style="border-top:1px solid var(--border)">Diana A.</td><td style="text-align:right;border-top:1px solid var(--border)"><span class="chip chip--ok">✔</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="shot__cap">Bitácora inmutable: quién, cuándo y resultado. Exportable a CSV.</div>
+          <div class="shot__cap">Feed en vivo de cada apertura, con resultado y hora.</div>
         </div>
         <!-- Empleados -->
         <div class="shot">
@@ -711,6 +801,23 @@
             <div class="ev"><span class="ev__av">PR</span><div class="ev__who"><b>Pedro R.</b><small>Retirado · 12 jun</small></div><span class="chip chip--no">INACTIVO</span></div>
           </div>
           <div class="shot__cap">Alta, baja y permisos de cada empleado en segundos.</div>
+        </div>
+        <!-- Registro facial -->
+        <div class="shot">
+          <div class="shot__bar"><i></i><i></i><i></i><span>VISIONYX Access · Registro</span></div>
+          <div class="shot__body enr">
+            <div class="enr__face">☺</div>
+            <div class="enr__steps">
+              <div class="ok">✓ Mire al centro</div>
+              <div class="ok">✓ Gire a la izquierda</div>
+              <div class="ok">✓ Parpadee</div>
+              <div>○ Gire a la derecha</div>
+            </div>
+            <div class="mini-bars" style="margin-top:12px">
+              <div class="b"><span>Prueba de vida</span><i style="width:88%"></i></div>
+            </div>
+          </div>
+          <div class="shot__cap">Registro guiado con prueba de vida en tiempo real.</div>
         </div>
       </div>
     </div>
@@ -729,7 +836,7 @@
             <defs>
               <linearGradient id="sc-grad" x1="0" y1="0" x2="480" y2="300" gradientUnits="userSpaceOnUse"><stop stop-color="#22d3ee"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
               <linearGradient id="sc-glass" x1="30" y1="40" x2="360" y2="258" gradientUnits="userSpaceOnUse"><stop stop-color="#cdd9e6" stop-opacity=".34"/><stop offset="1" stop-color="#9fb0c4" stop-opacity=".22"/></linearGradient>
-              <clipPath id="sc-clip"><rect x="30" y="34" width="330" height="224"/></clipPath>
+              <clipPath id="sc-clip"><rect x="30" y="34" width="352" height="224"/></clipPath>
             </defs>
 
             <!-- techo / losa -->
@@ -740,8 +847,8 @@
             <!-- zona puerta (interior + vidrio + persona), recortada -->
             <g clip-path="url(#sc-clip)">
               <!-- interior azul -->
-              <rect x="30" y="34" width="330" height="224" fill="#1c3aa0"/>
-              <rect x="30" y="34" width="330" height="60" fill="#1a3490"/>
+              <rect x="30" y="34" width="352" height="224" fill="#1c3aa0"/>
+              <rect x="30" y="34" width="352" height="60" fill="#1a3490"/>
               <!-- banderitas -->
               <g>
                 <line x1="40" y1="48" x2="350" y2="44" stroke="#5e7bbf" stroke-width="1"/>
@@ -759,7 +866,7 @@
               <!-- lámpara -->
               <rect x="120" y="70" width="120" height="5" rx="2" fill="#cfe2ff" opacity=".75"/>
               <!-- piso interior -->
-              <rect x="30" y="214" width="330" height="44" fill="#3a3f47"/>
+              <rect x="30" y="214" width="352" height="44" fill="#3a3f47"/>
 
               <!-- persona (silueta) que se acerca -->
               <g class="sc-fig">
@@ -770,13 +877,13 @@
 
               <!-- puerta de vidrio esmerilado corrediza (se desliza) -->
               <g class="sc-door">
-                <rect x="30" y="40" width="330" height="218" rx="2" fill="url(#sc-glass)" stroke="#aebccd" stroke-width="1.4"/>
-                <rect x="30" y="40" width="330" height="218" rx="2" fill="#0a0e17" opacity=".22"/>
-                <line x1="195" y1="40" x2="195" y2="258" stroke="#aebccd" stroke-width="1" opacity=".5"/>
+                <rect x="30" y="40" width="320" height="218" rx="2" fill="url(#sc-glass)" stroke="#aebccd" stroke-width="1.4"/>
+                <rect x="30" y="40" width="320" height="218" rx="2" fill="#0a0e17" opacity=".22"/>
+                <line x1="190" y1="40" x2="190" y2="258" stroke="#aebccd" stroke-width="1" opacity=".5"/>
                 <!-- manija vertical -->
                 <rect x="52" y="120" width="5" height="60" rx="2.5" fill="#9fb4d6"/>
                 <!-- placa metálica (U sobre el vidrio) en el canto de cierre -->
-                <rect x="347" y="132" width="13" height="36" rx="2" fill="#11203c" stroke="url(#sc-grad)" stroke-width="1.6"/>
+                <rect x="338" y="132" width="13" height="36" rx="2" fill="#11203c" stroke="url(#sc-grad)" stroke-width="1.6"/>
               </g>
             </g>
 
@@ -788,24 +895,36 @@
             <rect x="424" y="20" width="3" height="238" fill="#eac95f" opacity=".6"/>
             <text x="436" y="150" font-family="Exo 2,sans-serif" font-size="7.5" fill="#cdb24a" transform="rotate(90 436 150)">ductería MT · cableado parqueadero</text>
 
-            <!-- perfil metálico (jamba): la puerta cierra al ras contra él -->
-            <rect x="360" y="40" width="16" height="218" rx="2" fill="#3b4866" stroke="url(#sc-grad)" stroke-width="2"/>
+            <!-- perfil metálico junto a la columna -->
+            <rect x="372" y="40" width="18" height="218" rx="2" fill="#3b4866" stroke="url(#sc-grad)" stroke-width="2"/>
             <!-- cerradura magnética POR DENTRO del perfil -->
-            <rect class="sc-mag" x="362" y="120" width="12" height="60" rx="3" fill="#11203c" stroke="url(#sc-grad)" stroke-width="1.4"/>
-            <circle class="sc-led" cx="368" cy="150" r="3.2" fill="#ff5470"/>
+            <rect class="sc-mag" x="374" y="120" width="14" height="60" rx="3" fill="#11203c" stroke="url(#sc-grad)" stroke-width="1.4"/>
+            <circle class="sc-led" cx="381" cy="150" r="3.2" fill="#ff5470"/>
+            <!-- campo magnético -->
+            <line x1="351" y1="150" x2="372" y2="150" stroke="url(#sc-grad)" stroke-width="1.2" stroke-dasharray="3 4" opacity=".75"/>
 
-            <!-- dispositivos SOBRE LA COLUMNA: cámara IP (alta) + tablet kiosko (altura del rostro) -->
+            <!-- dispositivo montado SOBRE la columna (perfil):
+                 cámara IP en la parte alta | tablet kiosko a la altura del rostro -->
             <g>
-              <!-- cámara IP, en lo alto de la columna -->
-              <rect x="398" y="60" width="20" height="13" rx="3" fill="#11203c" stroke="url(#sc-grad)" stroke-width="1.3"/>
-              <circle cx="408" cy="66.5" r="3.6" fill="none" stroke="#28e0a0" stroke-width="1.3"/>
-              <text x="408" y="52" font-family="Exo 2,sans-serif" font-size="7.5" fill="#7fa8e0" text-anchor="middle">cámara IP</text>
-              <!-- tablet kiosko (recomendada), a la altura de la cara -->
-              <rect x="396" y="138" width="24" height="42" rx="4" fill="#0a1424" stroke="#22d3ee" stroke-width="1.6"/>
-              <rect x="399" y="142" width="18" height="30" rx="2" fill="#0e1d3a"/>
-              <circle cx="408" cy="154" r="5" fill="none" stroke="#28e0a0" stroke-width="1.3"/>
-              <path d="M402 168 q6 -6 12 0" fill="none" stroke="#28e0a0" stroke-width="1.3"/>
-              <text x="408" y="192" font-family="Exo 2,sans-serif" font-size="7.5" fill="#7fd4ee" text-anchor="middle">tablet kiosko</text>
+              <!-- cámara IP — parte alta de la columna -->
+              <g>
+                <rect x="364" y="48" width="20" height="14" rx="3" fill="#0d1a2e" stroke="url(#sc-grad)" stroke-width="1.4"/>
+                <circle cx="374" cy="55" r="4.2" fill="none" stroke="#28e0a0" stroke-width="1.4"/>
+                <circle cx="374" cy="55" r="1.8" fill="#28e0a0" opacity=".5"/>
+                <rect x="366" y="61" width="16" height="3" rx="1" fill="#3b4866"/>
+                <text x="358" y="44" font-family="Exo 2,sans-serif" font-size="7.5" fill="#7fa8e0" text-anchor="end">▲ cámara IP</text>
+              </g>
+
+              <!-- tablet kiosko — a la altura del rostro (mismo nivel que la cara) -->
+              <g>
+                <rect x="362" y="138" width="26" height="40" rx="4" fill="#0a1424" stroke="#a855f7" stroke-width="1.6"/>
+                <rect x="366" y="143" width="18" height="26" rx="2" fill="#11203c"/>
+                <!-- mini rostro escaneado en pantalla -->
+                <circle cx="375" cy="153" r="5" fill="none" stroke="#28e0a0" stroke-width="1.3"/>
+                <path d="M369 169 q6 -6 12 0" fill="none" stroke="#28e0a0" stroke-width="1.3"/>
+                <rect x="368" y="171" width="14" height="1.5" rx="1" fill="#28e0a0" opacity=".5"/>
+                <text x="356" y="162" font-family="Exo 2,sans-serif" font-size="7.5" fill="#c79bf0" text-anchor="end">tablet kiosko</text>
+              </g>
             </g>
 
             <!-- piso exterior + riel + topes PRIVADO -->
@@ -832,7 +951,7 @@
           <div class="callout"><span class="pin">1</span><div><b>Perfil metálico vertical</b><p>Tubo rectangular anclado con tornillería junto a la columna: base rígida y a plomo para la cerradura.</p></div></div>
           <div class="callout"><span class="pin">2</span><div><b>Cerradura por dentro del perfil</b><p>Maglock fail-safe encajado dentro del perfil, en tracción y al ras. Agarre real, acabado limpio.</p></div></div>
           <div class="callout"><span class="pin">3</span><div><b>Placa metálica sobre el vidrio</b><p>Soporte en U para vidrio frameless en el canto de la corrediza. Sin perforar el vidrio.</p></div></div>
-          <div class="callout"><span class="pin">4</span><div><b>Tablet y cámara sobre la columna</b><p>La tablet (recomendada) a la altura del rostro, montada en la columna; la cámara IP, en el mismo lado pero más arriba.</p></div></div>
+          <div class="callout"><span class="pin">4</span><div><b>Cámara o tablet junto a la columna</b><p>La tablet a la altura del rostro; si elige cámara IP, va en el mismo punto pero más arriba.</p></div></div>
           <div class="callout"><span class="pin">5</span><div><b>Tope de alineación</b><p>La puerta cae siempre en el mismo punto para que el imán haga contacto pleno y no “salte”.</p></div></div>
           <div class="callout"><span class="pin">6</span><div><b>Ductería MT respetada</b><p>El cableado del parqueadero queda intacto; nuestro cable va en canalización independiente.</p></div></div>
         </div>
@@ -840,380 +959,264 @@
     </div>
   </section>
 
-  <!-- ══ SEGURIDAD / EVACUACIÓN ══ -->
-  <section class="section">
+  <!-- ══ DISPOSITIVO POR PLAN ══ -->
+  <section id="opciones" class="section">
     <div class="container">
-      <p class="kicker">Seguridad y evacuación</p>
-      <h2 class="section__title">Una puerta segura es, primero, una salida segura</h2>
-      <p class="section__sub">Como es la única salida de la oficina, el diseño prioriza el egreso: salir siempre debe ser libre e inmediato. El reconocimiento facial controla solo la <strong>entrada</strong>.</p>
-      <div class="safe">
-        <div class="safe__card">
-          <h3>🟢 Salir nunca depende del sistema</h3>
-          <ul>
-            <li>Botón de salida (REX) o sensor interior: salir es instantáneo, sin reconocer nada.</li>
-            <li>Cerradura <b>fail-safe</b>: sin energía = puerta liberada. Nadie queda encerrado.</li>
-            <li>Un corte de luz deja la puerta abierta: ni siquiera entonces se repite el “todos afuera”.</li>
-            <li>Preparada para integrarse con la alarma de incendios del edificio.</li>
-          </ul>
-        </div>
-        <div class="safe__card">
-          <h3>🛠️ Instalación limpia y responsable</h3>
-          <ul>
-            <li>Perfil <b>anclado con tornillería</b>, sin soldadura ni daño a la estructura.</li>
-            <li>Cableado eléctrico en canalización propia, sin tocar la ductería MT del parqueadero.</li>
-            <li>Trabajo ordenado y coordinado con la administración del edificio.</li>
-            <li>Acabados discretos, a tono con la puerta y la columna existentes.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ LAS DOS OPCIONES ══ -->
-  <section id="opciones" class="section section--alt">
-    <div class="container">
-      <p class="kicker">Dos caminos · una misma tecnología</p>
-      <h2 class="section__title">Elija cómo quiere que reconozca a su equipo</h2>
-      <p class="section__sub">Ambas opciones usan el mismo motor de VISIONYX Access (reconocimiento + prueba de vida + fail-secure) y la misma cerradura. Solo cambia el <strong>dispositivo en la entrada</strong>, sobre la columna. <strong>Recomendamos la Opción A — Tablet Kiosko</strong>: es la experiencia que su equipo va a querer usar.</p>
+      <p class="kicker">El dispositivo en la columna</p>
+      <h2 class="section__title">Cámara IP en Essential · Kiosko en Professional</h2>
+      <p class="section__sub">Ambos planes usan el mismo motor de VISIONYX Access (reconocimiento + prueba de vida + decisión fail-secure) y la misma cerradura. Lo que cambia es el dispositivo en la entrada: <strong>cámara IP</strong> en Essential (manos libres) y <strong>kiosko interactivo</strong> en Professional (con pantalla).</p>
 
       <div class="options">
-        <article class="opt opt--a opt--rec">
-          <span class="opt__ribbon">Recomendada</span>
-          <span class="opt__badge">Opción A · Tablet Kiosko</span>
-          <h3>Se mira en la pantalla y la puerta se abre</h3>
-          <p class="opt__sub">Una tablet a la altura del rostro, sobre la columna, corre el kiosko de Access: el empleado se ve en pantalla, el sistema lo reconoce con prueba de vida y la puerta se abre. Directo, moderno y memorable.</p>
+        <article class="opt opt--a">
+          <span class="opt__badge">Incluido en Essential · Cámara IP</span>
+          <h3>Reconocimiento manos libres</h3>
+          <p class="opt__sub">Una cámara IP fija montada en la parte alta de la columna lee el rostro al acercarse. El mini-PC corre todo localmente. Discreto y robusto.</p>
           <ul class="opt__list">
-            <li>El empleado se mira y entra: experiencia clara e inmediata</li>
-            <li>Veredicto en vivo “CONCEDIDO / DENEGADO” frente a la persona</li>
-            <li>Guía el registro y el reto de vida (gira / parpadea) en tiempo real</li>
-            <li>Pantalla a la altura del rostro, montada sobre la columna</li>
-            <li>Doble uso: avisos internos y la marca de la empresa en la entrada</li>
+            <li>Cámara IP con visión en baja luz (ideal para el sótano)</li>
+            <li>Reconocimiento continuo 1:N, sin tocar nada</li>
+            <li>Mini-PC local corre backend + IA (privacidad total)</li>
+            <li>Hardware fijo, sin pantalla expuesta a daños</li>
           </ul>
-          <div class="opt__for"><b>Por qué la recomendamos:</b> es la cara más moderna y profesional para la entrada. El empleado recibe confirmación visual al instante, el registro es guiado, y la experiencia de “mirarse y entrar” convierte el acceso en algo agradable, no en un trámite.</div>
+          <div class="opt__for">Ideal si quiere <b>lo más simple y discreto</b>: el empleado llega, lo reconoce y entra, sin interactuar con ninguna pantalla.</div>
         </article>
 
         <article class="opt opt--b">
-          <span class="opt__badge">Opción B · Cámara IP</span>
-          <h3>Reconocimiento manos libres</h3>
-          <p class="opt__sub">Una cámara IP de visión nocturna, sobre la columna y un poco más alta, lee el rostro al acercarse. Un indicador luminoso y un aviso sonoro confirman el resultado. Sin pantalla, máxima robustez.</p>
+          <span class="opt__badge">Incluido en Professional · Kiosko</span>
+          <h3>Kiosko interactivo en la entrada</h3>
+          <p class="opt__sub">Una tablet montada junto a la columna, a la altura del rostro, corre el kiosko de Access: muestra el rostro, el veredicto en vivo y guía al empleado en pantalla.</p>
           <ul class="opt__list">
-            <li>Cámara con visión nocturna real (WDR/IR), pensada para el sótano</li>
-            <li>Manos libres: entra sin tocar nada, con cosas en la mano</li>
-            <li>Realimentación con indicador luminoso + aviso sonoro</li>
-            <li>Sin pantalla expuesta: máxima resistencia y bajo mantenimiento</li>
+            <li>Pantalla que muestra “CONCEDIDO / DENEGADO” en vivo</li>
+            <li>Experiencia visual moderna y con factor “wow”</li>
+            <li>Guía el registro y el parpadeo/giro en tiempo real</li>
+            <li>Cámara frontal de la tablet + lógica del kiosko</li>
+            <li>Soporte antirrobo y kiosk-mode bloqueado</li>
           </ul>
-          <div class="opt__for"><b>Ideal si prefiere:</b> la máxima robustez y cero interacción —o un menor costo de equipo en la entrada—, a cambio de no tener pantalla con feedback visual.</div>
+          <div class="opt__for">Ideal si quiere una <b>entrada que se vea y se sienta high-tech</b>, con retroalimentación visible para cada persona.</div>
         </article>
       </div>
-
-      <div class="why">
-        <div class="why__card">
-          <h4>🤔 Por qué cada opción</h4>
-          <p><b>Tablet (A):</b> la experiencia que el equipo quiere —verse en pantalla y entrar—, moderna y con confirmación visual. <b>Cámara (B):</b> manos libres y máxima robustez, ideal si prefieren cero interacción. <b>Ambas reconocen igual de bien</b>; lo que cambia es la experiencia en la puerta.</p>
-        </div>
-        <div class="why__card lock">
-          <h4>🔒 Por qué esta cerradura (y no otra)</h4>
-          <p>La puerta es de <b>vidrio corredizo sin marco</b>. Eso descarta una cerradura embutida o un pestillo eléctrico —no hay marco donde alojarlos— y un perno al piso sería poco fiable sobre el riel. La <b>cerradura magnética fail-safe</b> con placa en U sobre el vidrio e imán dentro del perfil junto a la columna es la <b>única solución limpia</b>: no perfora el vidrio, respeta el egreso y deja la puerta al ras.</p>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- ══ ESCALABILIDAD ══ -->
-  <section class="section">
-    <div class="container">
-      <p class="kicker">Crece con su empresa</p>
-      <h2 class="section__title">Hoy una puerta. Mañana, su plataforma de acceso.</h2>
-      <p class="section__sub">No compra un dispositivo aislado: empieza una plataforma que puede crecer cuando lo necesite, sin reinvertir desde cero. <strong>El alcance de hoy es exclusivamente el acceso con Face ID</strong>; las siguientes ampliaciones son opcionales y se cotizan aparte.</p>
-      <div class="scale">
-        <div class="scale__item"><span class="ic">▸</span><div><b>Más puertas</b><p>Sume accesos al mismo sistema cuando quiera.</p></div></div>
-        <div class="scale__item"><span class="ic">▸</span><div><b>Varias sedes</b><p>Administre todas las ubicaciones desde una sola consola.</p></div></div>
-        <div class="scale__item"><span class="ic">▸</span><div><b>Control de visitantes</b><p>Registro y autorización temporal de visitas.</p></div></div>
-        <div class="scale__item"><span class="ic">▸</span><div><b>Integración con RRHH</b><p>Conecte altas y bajas con su nómina o sistema de personal.</p></div></div>
-        <div class="scale__item"><span class="ic">▸</span><div><b>Control horario</b><p>Permisos por franjas y días para cada empleado.</p></div></div>
-        <div class="scale__item"><span class="ic">▸</span><div><b>Reportes de asistencia</b><p>Las entradas se vuelven datos: puntualidad y presencia.</p></div></div>
-      </div>
-      <div class="hs__note" style="margin-top:18px">💡 Estas capacidades (más puertas, sedes, visitantes, integración con nómina, control horario y asistencia) son <b>opcionales y adicionales, a convenir</b>. No hacen parte de esta propuesta, centrada en lo que hoy requiere: el acceso con Face ID en una puerta.</div>
-    </div>
-  </section>
-
-  <!-- ══ QUÉ INCLUYE LA IMPLEMENTACIÓN ══ -->
-  <section class="section">
-    <div class="container">
-      <p class="kicker">Qué incluye la implementación</p>
-      <h2 class="section__title">No entregamos una caja: entregamos el sistema funcionando</h2>
-      <p class="section__sub">El precio es por una solución llave en mano. Esto es todo lo que hacemos, de principio a fin.</p>
-      <div class="incl">
-        <div><b>Visita técnica</b> y levantamiento de medidas</div>
-        <div><b>Fabricación y anclaje</b> del perfil metálico</div>
-        <div><b>Instalación</b> de cerradura, U y tope de alineación</div>
-        <div><b>Cableado y canalización</b> independiente</div>
-        <div><b>Montaje</b> de tablet/cámara, servidor y monitor</div>
-        <div><b>Configuración</b> del software y del controlador</div>
-        <div><b>Enrolamiento facial</b> de los empleados</div>
-        <div><b>Capacitación</b> al personal que administra</div>
-        <div><b>Pruebas</b> de extremo a extremo (egreso, re-bloqueo)</div>
-        <div><b>Puesta en marcha</b> y entrega formal (acta)</div>
-        <div><b>Documentación</b> de la instalación y credenciales</div>
-        <div><b>Acompañamiento</b> los primeros días de operación</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ CRONOGRAMA ══ -->
+  <!-- ══ ROADMAP ══ -->
   <section class="section section--alt">
     <div class="container">
-      <p class="kicker">Cronograma</p>
-      <h2 class="section__title">Un proyecto corto y predecible</h2>
-      <p class="section__sub">Tiempos de referencia desde el anticipo. Una sola puerta se ejecuta rápido.</p>
-      <div class="timeline">
-        <div class="tl"><div class="w">Semana 1</div><b>Acuerdo y compra</b><p>Firma, anticipo y pedido de equipos. Visita técnica de confirmación.</p></div>
-        <div class="tl"><div class="w">Semana 2</div><b>Instalación física</b><p>Perfil, cerradura, U, cableado, montaje de tablet/cámara, servidor y monitor.</p></div>
-        <div class="tl"><div class="w">Semana 3</div><b>Configuración</b><p>Software, controlador, enrolamiento de empleados y pruebas de seguridad.</p></div>
-        <div class="tl"><div class="w">Semana 4</div><b>Entrega</b><p>Capacitación, puesta en marcha, documentación y acompañamiento.</p></div>
+      <p class="kicker">Invierte en una plataforma, no en un dispositivo</p>
+      <h2 class="section__title">Hoy una puerta. Mañana, su capa de identidad.</h2>
+      <p class="section__sub">VISIONYX Access es un producto vivo. Lo que adquiere hoy es el punto de partida de una plataforma que evoluciona con su empresa. Este es su recorrido.</p>
+      <div class="roadmap">
+        <div class="rm rm--now">
+          <span class="rm__tag">● NÚCLEO</span>
+          <h3>La base que ya opera</h3>
+          <ul>
+            <li>Reconocimiento facial 1:N + prueba de vida</li>
+            <li>Registro guiado con liveness activo</li>
+            <li>Gestión de empleados y consentimiento</li>
+            <li>Bitácora de eventos auditable</li>
+            <li>Kiosko de puerta + consola web</li>
+            <li>Inferencia local y operación offline</li>
+          </ul>
+          <div class="rm__foot">Incluido en Essential y Professional.</div>
+        </div>
+        <div class="rm rm--next">
+          <span class="rm__tag">▸ CAPA INTELIGENTE</span>
+          <h3>La plataforma que trabaja sola</h3>
+          <ul>
+            <li>Portal Cloud VISIONYX</li>
+            <li>Dashboard ejecutivo y analítica</li>
+            <li>Monitoreo de salud y alertas</li>
+            <li>Respaldos automáticos</li>
+            <li>VISIONYX Assistant sobre sus accesos</li>
+            <li>Preparado para múltiples sedes</li>
+          </ul>
+          <div class="rm__foot">Incluido en el plan Professional.</div>
+        </div>
+        <div class="rm rm--vision">
+          <span class="rm__tag">◎ EVOLUCIÓN</span>
+          <h3>Hacia dónde crece todo esto</h3>
+          <ul>
+            <li>Integración con RRHH / nómina</li>
+            <li>Control de visitantes temporales</li>
+            <li>Reportes y analítica avanzada</li>
+            <li>Permisos por franja horaria</li>
+            <li>Control horario y asistencia</li>
+            <li>Nuevas puertas y sedes sin reinvertir</li>
+          </ul>
+          <div class="rm__foot">Roadmap de producto, sin costo adicional para clientes Professional.</div>
+        </div>
       </div>
+      <div class="flow__note" style="margin-top:20px">📈 <b>El hardware se compra una vez; la plataforma evoluciona.</b> Adquirir VISIONYX Access es entrar a un producto en mejora continua, no comprar un dispositivo que se obsoletiza.</div>
     </div>
   </section>
 
-  <!-- ══ INVERSIÓN ══ -->
-  <section id="inversion" class="section section--alt">
+  <!-- ══ INVERSIÓN — DOS PLANES ══ -->
+  <section id="inversion" class="section">
     <div class="container">
       <p class="kicker">Inversión</p>
-      <h2 class="section__title">Una inversión única, transparente por opción</h2>
-      <p class="section__sub">El valor de la <strong>solución completa, llave en mano</strong> (hardware + instalación + capacitación + software). El detalle técnico —equipos y materiales— está desplegable más abajo. Valores en COP <em>(pendientes de confirmar)</em>.</p>
+      <h2 class="section__title">Dos planes, una misma plataforma</h2>
+      <p class="section__sub"><strong>Essential</strong> resuelve hoy la puerta con cámara IP: control de acceso, administración local y auditoría. <strong>Professional</strong> eleva el acceso a plataforma inteligente con kiosko interactivo, nube, analítica, asistente y monitoreo. Ambos incluyen hardware, instalación y software. <strong>Precios con IVA incluido.</strong></p>
 
+      <!-- Totales -->
       <div class="inv-sum">
         <div class="inv-card a">
-          <div class="lab">OPCIÓN A · TABLET KIOSKO · <b style="color:var(--cyan)">RECOMENDADA</b></div>
-          <div class="tot"><span class="zero">$—</span></div>
-          <p>Incluye hardware, instalación, capacitación y software con kiosko interactivo en pantalla.</p>
+          <div class="lab">PLAN ESSENTIAL</div>
+          <div class="tot">$19.300.000</div>
+          <p>Control de acceso facial con <b>cámara IP</b> + administración local + auditoría + servidor + instalación.</p>
+          <div class="from">Pago único · Una puerta · IVA incluido</div>
         </div>
         <div class="inv-card b">
-          <div class="lab">OPCIÓN B · CÁMARA IP</div>
-          <div class="tot"><span class="zero">$—</span></div>
-          <p>Incluye hardware, instalación, capacitación y software VISIONYX Access. Manos libres y robusta.</p>
+          <div class="lab">PLAN PROFESSIONAL</div>
+          <div class="tot">$25.500.000</div>
+          <p>Todo lo de Essential + <b>kiosko de puerta</b> + Portal Cloud + Dashboard + Assistant + Monitoreo + Respaldos.</p>
+          <div class="from">Pago único · Una puerta · IVA incluido</div>
         </div>
       </div>
 
-      <details class="acc" open>
-        <summary>Ver detalle técnico — equipos y materiales</summary>
-        <div class="acc__body">
-      <!-- OPCIÓN A · TABLET (recomendada) -->
-      <div class="table-cap"><span class="t">Detalle · Opción A · Tablet Kiosko</span><span class="h">Valores en COP · IVA por definir</span></div>
+      <!-- Comparativa de planes -->
+      <div class="table-cap"><span class="t">Qué incluye cada plan</span><span class="h">Essential vs Professional · IVA incluido</span></div>
       <div class="table-wrap">
-        <table class="spec">
-          <thead><tr><th>Concepto</th><th style="text-align:right">Cant.</th><th style="text-align:right">V. unitario</th><th style="text-align:right">Subtotal</th></tr></thead>
+        <table class="cmp" style="background:var(--panel)">
+          <thead>
+            <tr>
+              <th style="text-align:left">Capacidad</th>
+              <th>Essential<br><small style="font-weight:400">$19,3 M</small></th>
+              <th class="win">Professional<br><small style="font-weight:400">$25,5 M</small></th>
+            </tr>
+          </thead>
           <tbody>
-            <tr class="sub"><td colspan="4">Cerradura y herrajes de puerta</td></tr>
-            <tr><td>Cerradura magnética fail-safe 280 kg<small>YLI YM-280 o equivalente</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Soporte en U para vidrio frameless + armadura (placa)</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Perfil metálico estructural (tubo rectangular)</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Botón de salida REX + caja</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Sensor magnético de puerta (reed NC superficie)</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr class="sub"><td colspan="4">Captura, cómputo y administración</td></tr>
-            <tr><td>Tablet + soporte antirrobo (montaje en columna)<small>corre el kiosko de Access</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Mini servidor — backend + Visión IA, 24/7<small>Beelink N100, 16 GB, SSD 500 GB (headless)</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Monitor de administración 22–24" + soporte</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Teclado + mouse</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Cámara USB (webcam) para registro de empleados</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr class="sub"><td colspan="4">Control, red y energía</td></tr>
-            <tr><td>Controlador ESP32-POE + módulo relé 1 canal optoacoplado</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Fuente 12 V para la cerradura<small>MeanWell LRS-50-12</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Switch de red / PoE + patch cords</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>UPS — servidor + monitor + red (no la cerradura)<small>APC Back-UPS</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr class="sub"><td colspan="3">Subtotal equipos</td><td class="num zero">$0</td></tr>
-            <tr><td>Instalación física: perfil, cerradura, U, tope y montajes</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr><td>Materiales de instalación (por consumo · ver detalle abajo)</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr><td>Configuración, enrolamiento, capacitación y puesta en marcha</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr><td>Software VISIONYX Access (implementación + kiosko)</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr class="total"><td colspan="3">TOTAL OPCIÓN A</td><td class="num zero">$0</td></tr>
+            <tr><td>Reconocimiento facial + prueba de vida</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Dispositivo de captura</td><td class="yes">Cámara IP</td><td class="win yes">Kiosko de puerta</td></tr>
+            <tr><td>Consola de administración</td><td class="yes">Local</td><td class="win yes">Local + Cloud</td></tr>
+            <tr><td>Auditoría de eventos</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Gestión de empleados y consentimiento</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Servidor local + instalación</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Actualizaciones de software (12 meses)</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Portal Cloud VISIONYX</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>Dashboard ejecutivo y analítica</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>VISIONYX Assistant</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>Monitoreo de salud + alertas</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>Respaldos automáticos</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>Preparado para múltiples sedes</td><td class="no">—</td><td class="win yes">Sí</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- OPCIÓN B · CÁMARA -->
-      <div class="table-cap" style="margin-top:36px"><span class="t">Detalle · Opción B · Cámara IP</span><span class="h">Valores en COP · IVA por definir</span></div>
+      <!-- Detalle Essential por categoría (cerebro primero) -->
+      <div class="table-cap" style="margin-top:36px"><span class="t">Detalle · Plan Essential</span><span class="h">Ordenado por valor · IVA incluido</span></div>
       <div class="table-wrap">
         <table class="spec">
-          <thead><tr><th>Concepto</th><th style="text-align:right">Cant.</th><th style="text-align:right">V. unitario</th><th style="text-align:right">Subtotal</th></tr></thead>
+          <thead><tr><th>Categoría</th><th>Qué incluye</th><th style="text-align:right">Valor</th></tr></thead>
           <tbody>
-            <tr class="sub"><td colspan="4">Cerradura y herrajes de puerta</td></tr>
-            <tr><td>Cerradura magnética fail-safe 280 kg<small>YLI YM-280 o equivalente</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Soporte en U para vidrio frameless + armadura (placa)</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Perfil metálico estructural (tubo rectangular)</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Botón de salida REX + caja</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Sensor magnético de puerta (reed NC superficie)</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr class="sub"><td colspan="4">Captura, cómputo y administración</td></tr>
-            <tr><td>Cámara IP visión nocturna 4 MP + soporte antivandálico<small>Dahua / Hikvision ColorVu</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Indicador luminoso + aviso sonoro de puerta<small>realimentación al usuario sin pantalla</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Mini servidor — backend + Visión IA, 24/7<small>Beelink N100, 16 GB, SSD 500 GB (headless)</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Monitor de administración 22–24" + soporte</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Teclado + mouse</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Cámara USB (webcam) para registro de empleados</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr class="sub"><td colspan="4">Control, red y energía</td></tr>
-            <tr><td>Controlador ESP32-POE + módulo relé 1 canal optoacoplado</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Fuente 12 V para la cerradura<small>MeanWell LRS-50-12</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>Switch de red / PoE + patch cords</td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr><td>UPS — servidor + monitor + red (no la cerradura)<small>APC Back-UPS</small></td><td class="num">1</td><td class="num zero">$0</td><td class="num zero">$0</td></tr>
-            <tr class="sub"><td colspan="3">Subtotal equipos</td><td class="num zero">$0</td></tr>
-            <tr><td>Instalación física: perfil, cerradura, U, tope y montajes</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr><td>Materiales de instalación (por consumo · ver detalle abajo)</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr><td>Configuración, enrolamiento, capacitación y puesta en marcha</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr><td>Software VISIONYX Access (implementación)</td><td class="num">—</td><td class="num">—</td><td class="num zero">$0</td></tr>
-            <tr class="total"><td colspan="3">TOTAL OPCIÓN B</td><td class="num zero">$0</td></tr>
+            <tr><td>Plataforma VISIONYX Access<small>Motor de reconocimiento facial, prueba de vida, consola, auditoría y servidor local. Licencia perpetua.</small></td><td>El cerebro del sistema</td><td class="num">$11.000.000</td></tr>
+            <tr><td>Infraestructura de acceso<small>Cerradura magnética fail-safe, perfil anclado, controlador ESP32 + relé, sensor de puerta, UPS y cámara IP.</small></td><td>El cuerpo de la puerta</td><td class="num">$4.800.000</td></tr>
+            <tr><td>Implementación y puesta en marcha<small>Montaje, cableado, canalización, configuración, enrolamiento del equipo y capacitación.</small></td><td>Mano de obra profesional</td><td class="num">$3.500.000</td></tr>
+            <tr class="total"><td colspan="2">TOTAL PLAN ESSENTIAL · UNA SOLA VEZ · IVA INCLUIDO</td><td class="num">$19.300.000</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Materiales de instalación (consumo) · ambas opciones -->
-      <div class="table-cap" style="margin-top:36px"><span class="t">Materiales de instalación · por consumo (aplica a ambas opciones)</span><span class="h">Se factura lo realmente instalado</span></div>
+      <!-- Detalle Professional -->
+      <div class="table-cap" style="margin-top:36px"><span class="t">Detalle · Plan Professional</span><span class="h">Essential + kiosko + capa inteligente · IVA incluido</span></div>
       <div class="table-wrap">
         <table class="spec">
-          <thead><tr><th>Material</th><th style="text-align:right">Valor</th></tr></thead>
+          <thead><tr><th>Categoría</th><th>Qué incluye</th><th style="text-align:right">Valor</th></tr></thead>
           <tbody>
-            <tr><td>Cable UTP Cat 6 (red · cámara IP · PoE)</td><td class="num zero">$0</td></tr>
-            <tr><td>Cable de control 12 V (cerradura · relé · fuente)</td><td class="num zero">$0</td></tr>
-            <tr><td>Tubería EMT / canaleta + curvas, uniones y conectores</td><td class="num zero">$0</td></tr>
-            <tr><td>Grapas, abrazaderas y cajas de paso</td><td class="num zero">$0</td></tr>
-            <tr><td>Chazos / tacos + tornillería de anclaje (perfil, soportes, cajas)</td><td class="num zero">$0</td></tr>
-            <tr><td>Tornillería de fijación (maglock, U, cámara / tablet / monitor)</td><td class="num zero">$0</td></tr>
-            <tr><td>Conectores RJ45 + botas + jack keystone</td><td class="num zero">$0</td></tr>
-            <tr><td>Multitoma / regleta + supresor de picos</td><td class="num zero">$0</td></tr>
-            <tr><td>Marquillas de cable + amarres (cinchos)</td><td class="num zero">$0</td></tr>
-            <tr><td>Tornillería de seguridad antivandálica (cámara / tablet)</td><td class="num zero">$0</td></tr>
-            <tr><td>Adhesivo estructural / cauchos para la U sobre el vidrio</td><td class="num zero">$0</td></tr>
-            <tr class="total"><td>TOTAL MATERIALES (por consumo)</td><td class="num zero">$0</td></tr>
+            <tr><td>Plan Essential completo<small>Toda la infraestructura, implementación y plataforma base.</small></td><td>Lo mismo de Essential</td><td class="num">$19.300.000</td></tr>
+            <tr><td>Kiosko de puerta + Capa Cloud<small>Kiosko interactivo en la entrada + Portal Cloud VISIONYX, dashboard ejecutivo, Assistant, monitoreo de salud, alertas, respaldos y preparación multi-sede.</small></td><td>La plataforma que trabaja sola</td><td class="num">$6.200.000</td></tr>
+            <tr class="total"><td colspan="2">TOTAL PLAN PROFESSIONAL · UNA SOLA VEZ · IVA INCLUIDO</td><td class="num">$25.500.000</td></tr>
           </tbody>
         </table>
       </div>
-        </div>
-      </details>
 
-      <div class="terms" style="margin-top:34px">
-        <div class="term"><div class="l">Forma de pago</div><div class="v">50 / 50</div><p>50% para iniciar · 50% contra entrega y puesta en marcha.</p></div>
-        <div class="term"><div class="l">Garantía</div><div class="v">12 meses</div><p>Incluida. Instalación, configuración y mano de obra. Equipos con garantía de fábrica.</p></div>
-        <div class="term"><div class="l">Capacitación</div><div class="v">Incluida</div><p>Incluida en la instalación, configuración y puesta en marcha.</p></div>
+      <!-- Nota del dispositivo -->
+      <div class="flow__note" style="margin-top:24px">📷 <b>Cámara IP vs Kiosko.</b> El plan <b>Essential</b> incluye <b>cámara IP</b> (manos libres, discreto, montada en la parte alta de la columna). El plan <b>Professional</b> añade el <b>kiosko de puerta</b> interactivo (pantalla a la altura del rostro con veredicto en vivo). El montaje y la cerradura son idénticos en ambos.</div>
+
+      <!-- Términos -->
+      <div class="terms" style="margin-top:30px">
+        <div class="term"><div class="l">Forma de pago</div><div class="v">50% / 50%</div><p>50% anticipo para iniciar; 50% contra entrega y puesta en marcha.</p></div>
+        <div class="term"><div class="l">Garantía de implementación</div><div class="v">90 días</div><p>Sobre instalación y configuración. Hardware con garantía de fábrica. Soporte continuo vía plan Care.</p></div>
+        <div class="term"><div class="l">Vigencia de la propuesta</div><div class="v">30 días</div><p>Los valores se mantienen dentro del plazo de la propuesta.</p></div>
       </div>
-    </div>
-  </section>
-
-  <!-- ══ CONTINUIDAD EN LA NUBE · PLANES ══ -->
-  <section class="section">
-    <div class="container">
-      <p class="kicker">Continuidad operativa · opcional</p>
-      <h2 class="section__title">Que una falla de hardware nunca pare su operación</h2>
-      <p class="section__sub">El sistema opera 100% local. De forma opcional, VISIONYX Access puede respaldar su información en la nube para recuperarse rápido ante cualquier daño del equipo o del disco —y migrar a un servidor nuevo en minutos, sin reconfigurar a mano.</p>
-
-      <div class="plans">
-        <div class="plan">
-          <span class="plan__tag">Incluido</span>
-          <div class="plan__name">Access · Standard</div>
-          <div class="plan__price">Instalación local</div>
-          <p class="opt__sub" style="margin:2px 0 0">Todo corre en su oficina, sin dependencia de internet.</p>
-          <ul>
-            <li>Operación local completa</li>
-            <li>Respaldo local programado</li>
-            <li>Garantía y capacitación incluidas</li>
-          </ul>
-        </div>
-        <div class="plan plan--feat">
-          <span class="plan__tag">Recomendado · recurrente</span>
-          <div class="plan__name">Access · Business</div>
-          <div class="plan__price"><span class="zero">$—</span> <small>/ mes</small></div>
-          <p class="opt__sub" style="margin:2px 0 0">Continuidad asegurada con respaldo automático en la nube.</p>
-          <ul>
-            <li>Todo lo de Standard</li>
-            <li>Respaldo automático: registros, eventos, usuarios y configuración</li>
-            <li>Recuperación rápida ante falla de hardware o disco</li>
-            <li>Restauración del sistema completo (reglas, permisos, parámetros)</li>
-            <li>Actualizaciones de software y soporte remoto</li>
-          </ul>
-        </div>
-        <div class="plan">
-          <span class="plan__tag">Máxima disponibilidad</span>
-          <div class="plan__name">Access · Enterprise</div>
-          <div class="plan__price"><span class="zero">$—</span> <small>/ mes</small></div>
-          <p class="opt__sub" style="margin:2px 0 0">Para operación crítica que no puede detenerse.</p>
-          <ul>
-            <li>Todo lo de Business</li>
-            <li>Monitoreo continuo del sistema</li>
-            <li>Soporte prioritario y restauración prioritaria</li>
-            <li>Reportes periódicos · API para integraciones</li>
-            <li>Respaldo de mayor frecuencia</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="flow__note" style="margin-top:18px">🛡️ <b>Privacidad primero.</b> A la nube se respaldan registros, eventos, configuración y datos de usuarios <b>cifrados</b>. La <b>biometría (los rostros)</b> permanece local —o se respalda cifrada de extremo a extremo y con consentimiento— para mantener el cumplimiento de la <b>Ley 1581</b>. Su cara nunca viaja “por si acaso”.</div>
     </div>
   </section>
 
   <!-- ══ SOPORTE Y GARANTÍA ══ -->
-  <section class="section">
-    <div class="container">
-      <p class="kicker">Soporte y garantía</p>
-      <h2 class="section__title">No lo dejamos instalado y nos vamos</h2>
-      <p class="section__sub">Acompañamos la puesta en marcha y respondemos después de entregar. Estamos disponibles <strong>24/7</strong>.</p>
-      <div class="terms">
-        <div class="term"><div class="l">Garantía de instalación</div><div class="v">12 meses</div><p>Mano de obra, montaje y configuración. Incluida en la inversión.</p></div>
-        <div class="term"><div class="l">Soporte remoto</div><div class="v">1er año</div><p>Atención y resolución a distancia durante la garantía.</p></div>
-        <div class="term"><div class="l">Tiempo de respuesta</div><div class="v">24 horas</div><p>Atendemos su solicitud dentro de 24 horas, 24/7.</p></div>
-        <div class="term"><div class="l">Actualizaciones de software</div><div class="v">1er año</div><p>Mejoras del sistema incluidas durante el primer año.</p></div>
-        <div class="term"><div class="l">Capacitación</div><div class="v">Incluida</div><p>Incluida en la instalación y la puesta en marcha.</p></div>
-        <div class="term"><div class="l">Mantenimiento extendido</div><div class="v">Opcional</div><p>Plan anual de soporte y mantenimiento, a convenir.</p></div>
-      </div>
-
-      <div class="hs__note" style="margin-top:22px">
-        <b>Cómo funciona la garantía.</b> Los 12 meses están <b>incluidos en la inversión</b> (no se cobran aparte) y empiezan desde el acta de puesta en marcha. Cubren defectos de instalación, configuración y mano de obra, más el reemplazo de componentes con falla de fábrica. No cubren daño por mal uso, vandalismo, manipulación por terceros ni daños provenientes de la red eléctrica del edificio.
-      </div>
-      <div class="hs__note" style="margin-top:12px">
-        <b>Mantenimiento y soporte extendido (opcional · a convenir).</b> Al terminar la garantía, puede contratar un plan anual que mantiene el sistema al día: soporte remoto continuo, mantenimiento preventivo (cerradura, cámara/tablet y equipo), prioridad de atención y actualizaciones. Se estructura como una cuota periódica y su valor se acuerda según el alcance. Lo dejamos planteado; no es obligatorio para operar.
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ QUÉ NO INCLUYE ══ -->
-  <section class="section">
-    <div class="container">
-      <p class="kicker">Alcance · transparencia</p>
-      <h2 class="section__title">Qué no incluye esta propuesta</h2>
-      <p class="section__sub">Para evitar malentendidos después, dejamos claro el límite del alcance. Cualquiera de estos puntos se puede cotizar aparte.</p>
-      <div class="card-plain" style="background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:26px 28px">
-        <div class="noinc">
-          <div>Obra civil mayor o resanes de muros y pisos</div>
-          <div>Adecuaciones eléctricas del edificio (toma dedicada nueva)</div>
-          <div>Internet o red de datos del edificio</div>
-          <div>UPS para toda la oficina (solo el del sistema)</div>
-          <div>Integración con sistemas de terceros no contemplados</div>
-          <div>Puertas o accesos adicionales (esta es una puerta)</div>
-          <div>Torniquetes, talanqueras u otros mecanismos</div>
-          <div>Licencias de software de terceros</div>
-          <div>Mantenimiento posterior a la garantía (plan aparte)</div>
-          <div>Permisos o trámites ante la administración del edificio</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ POR QUÉ VISIONYX ══ -->
   <section class="section section--alt">
     <div class="container">
-      <p class="kicker">Por qué VISIONYX</p>
-      <h2 class="section__title">Por qué nosotros y no un equipo de catálogo</h2>
-      <p class="section__sub">La diferencia no es el hardware —ese lo compra cualquiera—, es el software propio y quién responde después.</p>
-      <div class="whyvx">
-        <div class="why__card"><h4>🧩 Tecnología propia</h4><p>Desarrollamos el software; no revendemos una caja negra. Eso significa control, mejoras y un precio justo.</p></div>
-        <div class="why__card"><h4>💸 Sin licencias costosas</h4><p>No paga licencias por usuario ni por puerta a un fabricante extranjero. La plataforma es suya.</p></div>
-        <div class="why__card"><h4>🏠 Arquitectura local</h4><p>Sus datos y rostros viven en su oficina. Privacidad por diseño y cumplimiento de la Ley 1581.</p></div>
-        <div class="why__card"><h4>🛠️ Soporte directo</h4><p>Habla con quien construyó el sistema, no con un call center. Respondemos después de entregar.</p></div>
-        <div class="why__card"><h4>🎯 Personalizable</h4><p>Al ser propio, lo adaptamos a su operación: reglas, horarios, reportes e integraciones a futuro.</p></div>
-        <div class="why__card"><h4>✅ Ya existe, no es promesa</h4><p>El producto está en operación y puede probarlo hoy en el demo en vivo, antes de firmar.</p></div>
+      <p class="kicker">Garantía, soporte y cuidado de la plataforma</p>
+      <h2 class="section__title">Reglas claras: qué cubre la garantía y qué cubre el soporte</h2>
+      <p class="section__sub">Separamos tres cosas que muchos proveedores mezclan y que el cliente acaba pagando de más. Así usted sabe exactamente qué está incluido y dónde termina una cosa y empieza la otra.</p>
+
+      <!-- Lo incluido con la implementación -->
+      <div class="terms">
+        <div class="term"><div class="l">Garantía de implementación</div><div class="v">90 días</div><p>Sobre instalación, configuración y puesta en marcha. Cubrimos cualquier incidencia derivada de nuestro trabajo.</p></div>
+        <div class="term"><div class="l">Garantía de hardware</div><div class="v">De fábrica</div><p>Los equipos vienen con la garantía del fabricante. La gestionamos por usted.</p></div>
+        <div class="term"><div class="l">Actualizaciones de plataforma</div><div class="v">12 meses</div><p>Mejoras y nuevas versiones del software VISIONYX Access incluidas el primer año.</p></div>
+        <div class="term"><div class="l">Capacitación inicial</div><div class="v">Incluida</div><p>Entrenamos a quien administrará empleados, eventos y permisos.</p></div>
+      </div>
+
+      <div class="flow__note" style="margin-top:24px">🛡️ <b>Diferencia clave.</b> La <b>garantía</b> cubre errores nuestros (90 días). El <b>soporte</b> cubre su operación día a día (agregar usuarios, revisar eventos, dudas, cambios de red). El soporte continuo se contrata mediante un plan <b>VISIONYX Care</b>, opcional a partir del primer año.</p>
+
+      <!-- Planes Care -->
+      <div class="table-cap" style="margin-top:36px"><span class="t">VISIONYX Care · Soporte y mantenimiento continuo</span><span class="h">Opcional · a partir del primer año</span></div>
+      <div class="table-wrap">
+        <table class="cmp" style="background:var(--panel)">
+          <thead>
+            <tr>
+              <th style="text-align:left">Servicio</th>
+              <th>Care Essential<br><small style="font-weight:400">$1.800.000 / año</small></th>
+              <th>Care Business<br><small style="font-weight:400">$3.000.000 / año</small></th>
+              <th class="win">Care Premium<br><small style="font-weight:400">$4.800.000 / año</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Actualizaciones de software</td><td class="yes">Sí</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Soporte remoto en horario hábil</td><td class="yes">Sí</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Revisión de respaldos</td><td class="yes">Sí</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Prioridad de atención</td><td class="no">—</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Visitas preventivas al año</td><td class="no">—</td><td class="yes">2</td><td class="win yes">2</td></tr>
+            <tr><td>Revisión de UPS, cerradura y servidor</td><td class="no">—</td><td class="yes">Sí</td><td class="win yes">Sí</td></tr>
+            <tr><td>Respaldo cloud cifrado</td><td class="no">—</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>Monitoreo proactivo de salud</td><td class="no">—</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>Recuperación ante desastre</td><td class="no">—</td><td class="no">—</td><td class="win yes">Sí</td></tr>
+            <tr><td>SLA de respuesta</td><td class="mid">24 h</td><td class="yes">8 h</td><td class="win yes">4 h</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flow__note" style="margin-top:18px">⚠️ <b>Qué no incluye ningún plan Care.</b> Nuevas funcionalidades, integraciones a medida, ampliaciones, puertas o puntos de acceso adicionales y migraciones. Esos se cotizan por separado. Así protegemos el precio justo del soporte para todos.</div>
+
+      <!-- Respaldo cloud destacado -->
+      <div class="safe" style="margin-top:28px">
+        <div class="safe__card">
+          <h3>☁️ Respaldo cloud (Care Premium)</h3>
+          <ul>
+            <li>Copias cifradas externas: nunca pierde su configuración ni sus accesos.</li>
+            <li>Recuperación ante daño o robo del servidor local.</li>
+            <li>Restauración rápida de toda la plataforma.</li>
+            <li>Pregunta que se responde sola: <b>“¿y si se daña el computador?”</b></li>
+          </ul>
+        </div>
+        <div class="safe__card">
+          <h3>🔌 Mantenimiento preventivo (Care Business/Premium)</h3>
+          <ul>
+            <li>Revisión de cerradura magnética, sensor y mecánica de puerta.</li>
+            <li>Revisión de UPS, baterías y estado del SSD del servidor.</li>
+            <li>Verificación de cámara, iluminación y umbrales de liveness.</li>
+            <li>Reporte de salud del sistema tras cada visita.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="terms" style="margin-top:28px">
+        <div class="term"><div class="l">Tiempo de respuesta crítico</div><div class="v">4–24 h</div><p>Según plan Care contratado. La garantía de 90 días responde siempre.</p></div>
+        <div class="term"><div class="l">Atención fuera de horario</div><div class="v">Bajo SLA</div><p>Incidencias críticas (puerta sin operar) con respuesta prioritaria en Premium.</p></div>
+        <div class="term"><div class="l">Forma de pago Care</div><div class="v">Anual / semestral</div><p>Se activa a partir del primer año de operación. No es obligatorio.</p></div>
       </div>
     </div>
   </section>
 
   <!-- ══ CIERRE · RESULTADO ESPERADO ══ -->
-  <section class="section section--alt">
+  <section class="section">
     <div class="container">
       <div class="result">
         <p class="kicker" style="justify-content:center">Resultado esperado</p>
@@ -1228,8 +1231,8 @@
       <p class="kicker" style="margin-top:48px">Próximos pasos</p>
       <div class="steps4">
         <div class="step4"><div class="n">1</div><b>Pruebe el demo</b><p>Abra VISIONYX Access en vivo y compruébelo en su dispositivo.</p></div>
-        <div class="step4"><div class="n">2</div><b>Elija su opción</b><p>Cámara IP (manos libres) o Tablet Kiosko (interactivo).</p></div>
-        <div class="step4"><div class="n">3</div><b>Visita técnica</b><p>Confirmamos medidas, egreso y ruta del cableado.</p></div>
+        <div class="step4"><div class="n">2</div><b>Elija su plan</b><p>Essential (la puerta hoy) o Professional (plataforma inteligente).</p></div>
+        <div class="step4"><div class="n">3</div><b>Visita técnica</b><p>Confirmamos medidas, egreso, dispositivo de captura y cableado.</p></div>
         <div class="step4"><div class="n">4</div><b>Instalación</b><p>Montaje limpio, enrolamiento del equipo y puesta en marcha.</p></div>
       </div>
 
@@ -1242,6 +1245,46 @@
           <b>VISIONYX</b>
           Ingeniería de software · Medellín, Colombia<br />
           contacto@visionyx.lat · +57 304 214 8205
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ANEXO TÉCNICO ══ -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="annex">
+        <div class="annex__head"><span class="tag">ANEXO TÉCNICO</span></div>
+        <h2 class="section__title" style="max-width:none">Arquitectura y stack de ingeniería</h2>
+        <p class="lead">Para el equipo técnico que valida la propuesta. Esta es la arquitectura real del sistema, no un diagrama de marketing. Toda la tecnología es propia y opera localmente.</p>
+
+        <div class="annex__cols">
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:10px">Arquitectura por capas</h3>
+            <table class="spec">
+              <tbody>
+                <tr><td>Backend / decisión<small>NestJS (TypeScript), TypeORM, PostgreSQL. Política fail-secure en el dominio.</small></td><td class="num">local</td></tr>
+                <tr><td>Visión / IA<small>FastAPI + ONNX Runtime. Reconocimiento (InsightFace buffalo_l) + liveness activo/pasivo.</small></td><td class="num">local</td></tr>
+                <tr><td>Biometría / vectores<small>Qdrant (búsqueda 1:N). Plantillas, no imágenes.</small></td><td class="num">local</td></tr>
+                <tr><td>Firmware / puerta<small>ESP32: máquina de estados del maglock, re-bloqueo al cerrar, fail-safe ante corte.</small></td><td class="num">borde</td></tr>
+                <tr><td>UI<small>Kiosko de puerta + consola de administración (HTML/JS), MediaPipe autoalojado para liveness on-device.</small></td><td class="num">local</td></tr>
+                <tr><td>Contenedores<small>Docker Compose. Backend expuesto en el host; visión/Qdrant/Postgres en red interna.</small></td><td class="num">local</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:10px">Decisiones de diseño</h3>
+            <div class="safe__card" style="padding:18px">
+              <ul>
+                <li>El servicio de visión <b>nunca concede acceso</b>: solo infiere.</li>
+                <li>El backend <b>nunca carga IA</b>: solo aplica la política.</li>
+                <li>Re-bloqueo en el <b>firmware</b>: si se cae la red, la puerta igual se vuelve a bloquear.</li>
+                <li>Liveness revalidado <b>server-side</b>: no se confía en el veredicto del cliente.</li>
+                <li><code>controllerRef</code> (relé) y <code>rtspUrl</code> (cámara) nunca se exponen al cliente.</li>
+              </ul>
+            </div>
+            <div class="annex__note">⚙️ <b>Integración:</b> RTSP/ONVIF (cámaras), HTTP/relé (actuador), REST (API). Estándares abiertos, sin ataduras a un fabricante.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1263,9 +1306,11 @@
   </footer>
 
   <a class="wa-float" href="https://wa.me/573042148205" aria-label="Escríbenos por WhatsApp">✆</a>
-  <button class="btn btn--primary printbtn" onclick="window.print()">⬇ Descargar PDF</button>
+  <button id="demo-fab" class="demo-fab" aria-label="Probar VISIONYX Access en vivo"><span class="dot"></span> Probar demo en vivo</button>
+  <button class="btn btn--primary printbtn" title="Descargar PDF" aria-label="Descargar PDF" onclick="window.print()">⬇</button>
 
   <script>
+    // ── Año + menú móvil ───────────────────────────────────────────────
     document.getElementById('year').textContent = new Date().getFullYear();
     var t = document.querySelector('.nav__toggle');
     var links = document.querySelector('.nav__links');
@@ -1276,6 +1321,120 @@
     document.querySelectorAll('.nav__links a').forEach(function (a) {
       a.addEventListener('click', function () { links.classList.remove('nav__links--open'); });
     });
+
+    // ── Launcher de demo integrado ────────────────────────────────────
+    // Genera una sesión efímera y aislada en el backend real, sin salir de la
+    // propuesta. El visitante obtiene credenciales únicas que se autodestruyen
+    // a los 60 min, y puede abrir el kiosko/consola mientras sigue leyendo.
+    (function () {
+      var API = 'https://demo.visionyx.lat/api/v1';
+      var KIOSK = 'https://demo.visionyx.lat/kiosk';
+      var LS = 'vyx_propuesta_demo';
+      var RING = 150.8;            // 2π·24
+      var ticket = null, timer = null;
+
+      var $ = function (id) { return document.getElementById(id); };
+
+      function fmt(ms) {
+        var s = Math.max(0, Math.floor(ms / 1000));
+        var m = Math.floor(s / 60); s = s % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function showLive(tk) {
+        ticket = tk;
+        $('gen-state').style.display = 'none';
+        $('live-state').style.display = 'block';
+        $('cred-user').textContent = tk.email;
+        $('cred-pass').textContent = tk.password;
+        $('lnk-admin').href = KIOSK + '/admin.html';
+        $('lnk-kiosk').href = KIOSK + '/';
+        $('ttl-sub').textContent = 'Se autodestruye en ' + tk.ttlMinutes + ' minutos. Al expirar se borra todo: su rostro y sus datos.';
+        var fab = $('demo-fab');
+        if (fab) { fab.classList.add('active'); fab.innerHTML = '<span class="dot"></span> Demo activo · ' + fmt(new Date(tk.expiresAt).getTime() - Date.now()); }
+        startTimer();
+      }
+
+      function startTimer() {
+        if (timer) clearInterval(timer);
+        var total = ticket.ttlMinutes * 60000;
+        var tick = function () {
+          var left = new Date(ticket.expiresAt).getTime() - Date.now();
+          $('ttl-clock').textContent = fmt(left);
+          var frac = Math.max(0, Math.min(1, left / total));
+          $('ttl-arc').style.strokeDashoffset = String(RING * (1 - frac));
+          $('ttl-box').classList.toggle('ending', left < 5 * 60000);
+          var fab = $('demo-fab');
+          if (fab) { fab.classList.add('active'); fab.innerHTML = '<span class="dot"></span> Demo activo · ' + fmt(left); }
+          if (left <= 0) {
+            clearInterval(timer); timer = null;
+            localStorage.removeItem(LS);
+            $('ttl-clock').textContent = '00:00';
+            $('ttl-sub').textContent = 'La sesión expiró y todos sus datos fueron eliminados del servidor.';
+            if (fab) { fab.classList.remove('active'); fab.innerHTML = '<span class="dot"></span> Probar demo en vivo'; }
+            location.hash = '#demo-launch';
+            window.scrollTo({ top: $('launch-panel').getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' });
+          }
+        };
+        tick();
+        timer = setInterval(tick, 1000);
+      }
+
+      function generate() {
+        var btn = $('btn-gen'); btn.disabled = true; btn.textContent = 'Creando su sesión…';
+        $('gen-err').style.display = 'none';
+        fetch(API + '/access/demo/session', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+          .then(function (r) {
+            if (!r.ok) return r.json().then(function (b) { throw new Error(b.message || 'No se pudo crear la sesión'); });
+            return r.json();
+          })
+          .then(function (tk) {
+            try { localStorage.setItem(LS, JSON.stringify(tk)); } catch (e) {}
+            showLive(tk);
+          })
+          .catch(function (e) {
+            btn.disabled = false; btn.textContent = '⚡ Generar mi acceso de prueba';
+            var err = $('gen-err'); err.textContent = e.message || 'No se pudo crear la sesión. Intente de nuevo.'; err.style.display = 'block';
+          });
+      }
+
+      // Botón generar
+      var btnGen = $('btn-gen'); if (btnGen) btnGen.addEventListener('click', generate);
+
+      // Copiar credenciales
+      document.addEventListener('click', function (e) {
+        var b = e.target.closest('.cred-copy'); if (!b) return;
+        var tgt = b.getAttribute('data-copy-target');
+        var text = tgt ? ($(tgt) ? $(tgt).textContent : '') : '';
+        if (!text || text === '—') return;
+        var done = function () {
+          var prev = b.textContent; b.textContent = '✓ Copiado'; b.classList.add('done');
+          setTimeout(function () { b.textContent = prev; b.classList.remove('done'); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(fb);
+        } else { fb(); }
+        function fb() {
+          var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.focus(); ta.select();
+          try { document.execCommand('copy'); done(); } catch (x) {}
+          document.body.removeChild(ta);
+        }
+      });
+
+      // Botón flotante: lleva al launcher (si ya hay sesión, la muestra)
+      var fab = $('demo-fab');
+      if (fab) fab.addEventListener('click', function () {
+        var panel = $('launch-panel');
+        window.scrollTo({ top: panel.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' });
+      });
+
+      // Reanuda sesión vigente al recargar (si no expiró)
+      try {
+        var saved = JSON.parse(localStorage.getItem(LS) || 'null');
+        if (saved && saved.expiresAt && new Date(saved.expiresAt).getTime() > Date.now()) showLive(saved);
+      } catch (e) {}
+    })();
   </script>
 </body>
 </html>
