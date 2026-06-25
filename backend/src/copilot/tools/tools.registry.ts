@@ -13,15 +13,16 @@ import type { ToolSchema } from '../../assistant/llm.provider';
 import { createSystemTools, type SystemToolDeps } from './system-tools';
 import { createActionTools, type ActionToolDeps } from './action-tools';
 import type { ToolArgs, ToolResult } from './tools.types';
+import type { ConversationSnapshot, ToolContext } from './snapshot.types';
 
 /** Marca de cada familia, para auditar/limitar por categoría si hace falta. */
 export type ToolFamily = 'system' | 'action';
 
-/** Entrada del registro: familia + ejecutor atribuido al usuario. */
+/** Entrada del registro: familia + ejecutor con contexto de conversación. */
 interface ToolEntry {
   family: ToolFamily;
-  /** Ejecuta la tool; `userId` es el admin que dispara la conversación. */
-  run: (args: ToolArgs, userId: string) => Promise<ToolResult>;
+  /** Ejecuta la tool; `ctx` lleva el userId, la conversación y el snapshot previo. */
+  run: (args: ToolArgs, ctx: ToolContext) => Promise<ToolResult>;
 }
 
 /**
@@ -44,6 +45,8 @@ export class ToolsRegistry {
   private readonly entries = new Map<string, ToolEntry>();
   private readonly schemas: ToolSchema[] = [];
   private readonly actionsEnabled: boolean;
+  /** Capturador de snapshot (de las tools de sistema); null si no se crearon. */
+  private readonly snapshotFn: (() => Promise<ConversationSnapshot>) | null;
 
   constructor(
     config: ConfigService,
@@ -58,13 +61,15 @@ export class ToolsRegistry {
     this.actionsEnabled = config.get<string>('COPLOT_ACTIONS_ENABLED', 'true') !== 'false';
 
     // 1) Sistema — consultas de solo lectura sobre todo el control de acceso
-    //    (empleados, eventos, puntos, cámaras, puerta, salud, credenciales).
+    //    (empleados, eventos, puntos, cámaras, puerta, salud, credenciales),
+    //    más análisis (novedades, resumen operativo) y captura de snapshot.
     const sysDeps: SystemToolDeps = { access, accessPoints, enrollment, cameras, kiosk, vision, rotator };
     const system = createSystemTools(sysDeps);
+    this.snapshotFn = system.captureSnapshot;
     for (const s of system.schemas) {
       this.entries.set(s.function.name, {
         family: 'system',
-        run: (args) => system.execute(s.function.name, args),
+        run: (args, ctx) => system.execute(s.function.name, args, ctx),
       });
     }
     this.schemas.push(...system.schemas);
@@ -78,7 +83,7 @@ export class ToolsRegistry {
       for (const s of action.schemas) {
         this.entries.set(s.function.name, {
           family: 'action',
-          run: (args, userId) => action.execute(s.function.name, args, userId),
+          run: (args, ctx) => action.execute(s.function.name, args, ctx),
         });
       }
       this.schemas.push(...action.schemas);
@@ -100,20 +105,31 @@ export class ToolsRegistry {
   }
 
   /**
-   * Ejecuta una tool por nombre, atribuyéndola al `userId`. Nunca lanza: en
-   * error devuelve `{ ok:false, output:'error: …' }`. El servicio decide qué
-   * auditar a partir de `family` y `ok`.
+   * Ejecuta una tool por nombre, pasándole el contexto del turno (userId,
+   * conversación y snapshot previo). Nunca lanza: en error devuelve
+   * `{ ok:false, output:'error: …' }`. El servicio decide qué auditar a
+   * partir de `family` y `ok`.
    */
   async dispatch(
     name: string,
     args: ToolArgs,
-    userId: string,
+    ctx: ToolContext,
   ): Promise<ToolResult & { family: ToolFamily }> {
     const entry = this.entries.get(name);
     if (!entry) {
       return { ok: false, output: `error: herramienta desconocida ${name}`, family: 'system' };
     }
-    const res = await entry.run(args ?? {}, userId);
+    const res = await entry.run(args ?? {}, ctx);
     return { ...res, family: entry.family };
+  }
+
+  /**
+   * Captura un snapshot fresco del sistema para persistirlo al cierre del turno
+   * (memoria entre consultas). Lanza si las tools de sistema no se crearon, así
+   * el llamador debe atraparlo y simplemente omitir la persistencia.
+   */
+  async captureSnapshot(): Promise<ConversationSnapshot> {
+    if (!this.snapshotFn) throw new Error('snapshot_no_disponible');
+    return this.snapshotFn();
   }
 }

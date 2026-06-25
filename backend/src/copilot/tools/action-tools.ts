@@ -5,6 +5,7 @@ import { AccessPointsService } from '../../access-control/access-points.service'
 import { CredentialRotatorService } from '../../credential-rotator/credential-rotator.service';
 import type { ToolSchema } from '../../assistant/llm.provider';
 import type { ToolArgs, ToolResult } from './tools.types';
+import type { ToolContext } from './snapshot.types';
 
 /** Dependencias que el módulo del copiloto inyecta en las tools de acción. */
 export interface ActionToolDeps {
@@ -101,14 +102,14 @@ export function createActionTools(deps: ActionToolDeps) {
     });
   }
 
-  async function execute(name: string, args: ToolArgs, userId: string): Promise<ToolResult> {
+  async function execute(name: string, args: ToolArgs, ctx: ToolContext): Promise<ToolResult> {
     if (!names.has(name)) {
       return { ok: false, output: `error: herramienta desconocida ${name}` };
     }
     try {
       switch (name) {
         case 'abrir_puerta':
-          return { ok: true, output: await openDoor(args, userId) };
+          return { ok: true, output: await openDoor(args, ctx.userId) };
         case 'rotar_credenciales':
           return { ok: true, output: await rotateCredentials() };
         default:

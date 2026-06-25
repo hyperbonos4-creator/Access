@@ -24,6 +24,15 @@ export class CopilotConversation {
   @Column({ type: 'varchar', length: 160 })
   title: string;
 
+  /**
+   * Fotografía del estado del sistema tomada al cierre del último turno del
+   * copiloto en esta conversación (JSONB). Permite que la tool `novedades`
+   * calcule el diff contra la consulta anterior. Null si aún no hay turno
+   * previo. Ver `ConversationSnapshot` para la forma del contenido.
+   */
+  @Column({ name: 'state_snapshot', type: 'jsonb', nullable: true })
+  stateSnapshot: unknown | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

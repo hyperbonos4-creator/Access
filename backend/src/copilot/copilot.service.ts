@@ -11,6 +11,7 @@ import { CopilotMessage } from './entities/copilot-message.entity';
 import { CopilotAudit } from './entities/copilot-audit.entity';
 import { ToolsRegistry } from './tools/tools.registry';
 import { buildCopilotSystemPrompt } from './copilot.prompt';
+import type { ConversationSnapshot, ToolContext } from './tools/snapshot.types';
 
 /** Una entrada de la traza de herramientas de un turno del asistente. */
 export interface ToolTraceEntry {
@@ -86,6 +87,14 @@ export class CopilotService {
       ? await this.loadConversation(input.conversationId, user.id)
       : await this.createConversation(user.id, message);
 
+    // Contexto del turno: userId (atribución), conversación y snapshot del
+    // turno previo (memoria entre consultas; lo usa la tool `novedades`).
+    const ctx: ToolContext = {
+      userId: user.id,
+      conversationId: conversation.id,
+      prevSnapshot: asSnapshot(conversation.stateSnapshot),
+    };
+
     // 2) Historial -> mensajes del LLM (pares user/assistant texto).
     const systemPrompt = buildCopilotSystemPrompt({
       operatorName: `${user.firstName} ${user.lastName}`.trim() || user.email,
@@ -138,7 +147,7 @@ export class CopilotService {
 
       for (const call of toolCalls) {
         const args = safeParseArgs(call.function.arguments);
-        const res = await this.registry.dispatch(call.function.name, args, user.id);
+        const res = await this.registry.dispatch(call.function.name, args, ctx);
         trace.push({
           id: call.id,
           tool: call.function.name,
@@ -193,8 +202,22 @@ export class CopilotService {
         toolTrace: trace.length ? trace : null,
       }),
     ]);
-    // Refresca updatedAt de la conversación (para ordenar la lista).
-    await this.conversations.update(conversation.id, { updatedAt: new Date() });
+    // Refresca updatedAt de la conversación (para ordenar la lista) y persiste
+    // un snapshot fresco del sistema (memoria entre consultas: la tool
+    // `novedades` del siguiente turno calculará el diff contra este). Es mejor-
+    // esfuerzo: si la captura falla, el turno ya terminó bien y no tiene sentido
+    // invalidar la respuesta — simplemente no habrá baseline la próxima vez.
+    let snapshot: ConversationSnapshot | null = null;
+    try {
+      snapshot = await this.registry.captureSnapshot();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      this.logger.warn(`No se pudo capturar el snapshot de cierre: ${msg}`);
+    }
+    await this.conversations.update(conversation.id, {
+      updatedAt: new Date(),
+      ...(snapshot ? { stateSnapshot: snapshot } : {}),
+    });
 
     return { conversationId: conversation.id, answer, toolTrace: trace };
   }
@@ -277,6 +300,43 @@ function safeParseArgs(raw: string): Record<string, unknown> {
   } catch {
     return {};
   }
+}
+
+/**
+ * Reinterpra el contenido de `state_snapshot` (JSONB opaco) como
+ * `ConversationSnapshot`, validando solo la forma mínima. Si la columna viene
+ * vacía o con un esquema inesperado, devuelve `null` (la tool `novedades` lo
+ * trata como "no hay consulta anterior") en vez de propagar datos corruptos.
+ */
+function asSnapshot(raw: unknown): ConversationSnapshot | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const eventos = o.eventos;
+  const empleados = o.empleados;
+  if (
+    typeof o.capturadoEn !== 'string' ||
+    !eventos ||
+    typeof eventos !== 'object' ||
+    !empleados ||
+    typeof empleados !== 'object'
+  ) {
+    return null;
+  }
+  return {
+    capturadoEn: o.capturadoEn,
+    eventos: {
+      total: Number((eventos as Record<string, unknown>).total) || 0,
+      granted: Number((eventos as Record<string, unknown>).granted) || 0,
+      denied: Number((eventos as Record<string, unknown>).denied) || 0,
+    },
+    ultimoEventoEn:
+      typeof o.ultimoEventoEn === 'string' ? o.ultimoEventoEn : null,
+    empleados: {
+      total: Number((empleados as Record<string, unknown>).total) || 0,
+      activos: Number((empleados as Record<string, unknown>).activos) || 0,
+      conBiometria: Number((empleados as Record<string, unknown>).conBiometria) || 0,
+    },
+  };
 }
 
 /** Recorta el resultado para el resumen de auditoría (nunca secreto). */

@@ -26,6 +26,8 @@ const TOOL_META = {
   listar_camaras: ['📷', 'Cámaras'],
   estado_puerta: ['🚪', 'Estado de puerta'],
   estado_sistema: ['🩺', 'Sistema'],
+  novedades: ['🆕', 'Novedades'],
+  resumen_operativo: ['🧭', 'Resumen operativo'],
   abrir_puerta: ['🔓', 'Abrió puerta'],
   rotar_credenciales: ['🔄', 'Rotó credenciales'],
 };

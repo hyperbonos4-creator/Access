@@ -12,6 +12,7 @@ import { CamerasService, type CameraView } from '../../cameras/cameras.service';
 import { CredentialRotatorService } from '../../credential-rotator/credential-rotator.service';
 import type { ToolSchema } from '../../assistant/llm.provider';
 import type { ToolArgs, ToolResult } from './tools.types';
+import type { ConversationSnapshot, ToolContext } from './snapshot.types';
 
 /** Dependencias que el módulo del copiloto inyecta en las tools de sistema. */
 export interface SystemToolDeps {
@@ -26,6 +27,8 @@ export interface SystemToolDeps {
 
 const MAX_EVENTS = 30; // tope de eventos que se entregan al modelo
 const MAX_EMPLOYEES = 40; // tope de empleados en listar_empleados
+/** Tope para análisis (novedades, resumen operativo): más contexto, sin saturar. */
+const MAX_ANALYTICS_EVENTS = 200;
 const MAX_RESULT = 9_000;
 
 function clip(s: string): string {
@@ -155,6 +158,24 @@ export function createSystemTools(deps: SystemToolDeps) {
         name: 'estado_sistema',
         description:
           'Salud detallada del sistema: microservicio de visión, base de datos, cámaras y pool de credenciales Cloudflare (cuántas cuentas, activas, cuál en uso). Útil para "¿el sistema está bien?", "¿quedan credenciales?".',
+        parameters: { type: 'object', properties: {} },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'novedades',
+        description:
+          'Compara el estado ACTUAL con el de la consulta anterior (snapshot guardado al cierre del turno previo) y devuelve solo las diferencias: eventos de acceso nuevos desde entonces, y cambios en el conteo de empleados. Úsala para "¿hay algo nuevo desde la última consulta?", "¿hubo cambios?", "¿qué pasó desde que pregunté?". Sin argumentos.',
+        parameters: { type: 'object', properties: {} },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'resumen_operativo',
+        description:
+          'Diagnóstico de operaciones de los últimos 7 días como lo haría un gerente: tasas de concesión/denegación, motivo principal de rechazo, cobertura de biometría, número de cámaras y una lista de `criticalIssues` (p. ej. "tasa de denegación anormal", "X% sin biometría", "no hay cámaras"). Úsala para "¿hay riesgo operativo?", "¿detectas anomalías?", "¿qué revisarías primero?", "¿está listo para producción?". Sin argumentos.',
         parameters: { type: 'object', properties: {} },
       },
     },
@@ -315,7 +336,199 @@ export function createSystemTools(deps: SystemToolDeps) {
     return JSON.stringify({ vision, baseDeDatos: database, camaras: cameras, credenciales: credentials });
   }
 
-  async function execute(name: string, args: ToolArgs): Promise<ToolResult> {
+  // ── memoria entre consultas + análisis ────────────────────────────────
+
+  /**
+   * Captura la "fotografía" del estado del sistema que se persiste al cierre de
+   * cada turno en `copilot_conversation.state_snapshot`. Reutiliza las mismas
+   * fuentes que `panel` (empleados + eventos de hoy). El pivot del diff temporal
+   * es `ultimoEventoEn`: el timestamp del evento más reciente.
+   *
+   * Robusta a "sin datos": si no hay eventos, `ultimoEventoEn` queda en null y la
+   * próxima consulta de novedades simplemente devolverá "todo lo existente".
+   */
+  async function captureSnapshot(): Promise<ConversationSnapshot> {
+    const today = startOfToday();
+    const [empleados, eventosHoy] = await Promise.all([
+      deps.enrollment.listSubjectsDetailed(),
+      deps.access.listEvents({ from: today, limit: MAX_ANALYTICS_EVENTS }),
+    ]);
+    // listEvents viene ordenado por recordedAt DESC: el primero es el más reciente.
+    const ultimo = eventosHoy[0]?.recordedAt ?? null;
+    return {
+      capturadoEn: new Date().toISOString(),
+      eventos: {
+        total: eventosHoy.length,
+        granted: eventosHoy.filter((e) => e.decision === 'GRANTED').length,
+        denied: eventosHoy.filter((e) => e.decision === 'DENIED').length,
+      },
+      ultimoEventoEn: ultimo ? new Date(ultimo).toISOString() : null,
+      empleados: {
+        total: empleados.length,
+        activos: empleados.filter((e) => e.status === 'ACTIVE').length,
+        conBiometria: empleados.filter((e) => e.hasBiometrics).length,
+      },
+    };
+  }
+
+  /**
+   * Compara el estado actual con el snapshot del turno anterior y devuelve SOLO
+   * las diferencias. El diff de eventos se hace por timestamp (`recordedAt >
+   * ultimoEventoEn`), que es inmune a topes de paginación: aunque el snapshot
+   * viera solo 30 de 50 eventos, lo que cuenta es "qué ocurrió después del
+   * último visto".
+   */
+  async function novedades(ctx: ToolContext): Promise<string> {
+    const prev = ctx.prevSnapshot;
+
+    // Empleados actuales para el delta de plantilla.
+    const empleadosAhora = await deps.enrollment.listSubjectsDetailed();
+
+    // Sin snapshot previo: no hay consulta anterior con la que comparar. No es
+    // un error; es simplemente "no hay baseline". Devolvemos el estado base.
+    if (!prev) {
+      const snapshot = await captureSnapshot();
+      return JSON.stringify({
+        hayConsultaAnterior: false,
+        nota: 'No existe una consulta anterior en esta conversación con la que comparar. Este es el estado base; la próxima vez que preguntes por novedades sí podré calcular el diff.',
+        estadoBase: snapshot,
+      });
+    }
+
+    // Pivote temporal para el diff. Preferimos el último evento visto (`ultimoEventoEn`),
+    // pero si el snapshot previo no registró eventos (sin actividad), caemos a
+    // `capturadoEn`: cualquier cosa grabada después del cierre del turno anterior
+    // cuenta como novedad. Así nunca pasamos `null` a `new Date`.
+    const pivote = prev.ultimoEventoEn ?? prev.capturadoEn;
+    const desde = new Date(pivote);
+    const nuevos = Number.isNaN(desde.getTime())
+      ? []
+      : await deps.access.listEventsWithActor({ from: desde, limit: MAX_ANALYTICS_EVENTS });
+    // `from` usa MoreThan: excluye el propio pivote (que ya estaba en el snapshot).
+    const concedidos = nuevos.filter((e) => e.decision === 'GRANTED').length;
+    const denegados = nuevos.filter((e) => e.decision === 'DENIED').length;
+
+    return JSON.stringify({
+      hayConsultaAnterior: true,
+      snapshotAnterior: prev,
+      eventosNuevos: {
+        total: nuevos.length,
+        concedidos,
+        denegados,
+        detalle: nuevos.slice(0, MAX_EVENTS).map((e) => ({
+          hora: e.recordedAt,
+          decision: e.decision,
+          motivo: e.reason,
+          subjectId: e.subjectId,
+          operador: e.actor,
+        })),
+      },
+      empleados: {
+        antes: prev.empleados,
+        ahora: {
+          total: empleadosAhora.length,
+          activos: empleadosAhora.filter((e) => e.status === 'ACTIVE').length,
+          conBiometria: empleadosAhora.filter((e) => e.hasBiometrics).length,
+        },
+        delta: {
+          total: empleadosAhora.length - prev.empleados.total,
+          activos: empleadosAhora.filter((e) => e.status === 'ACTIVE').length - prev.empleados.activos,
+        },
+      },
+    });
+  }
+
+  /**
+   * Diagnóstico de operaciones de 7 días como lo haría un gerente de seguridad.
+   * Calcula tasas, motivo dominante de denegación, cobertura de biometría y
+   * genera una lista explícita de `criticalIssues` con heurísticas claras, para
+   * que el modelo razoné sobre riesgo en vez de contestar "no" por defecto.
+   */
+  async function operationalSummary(): Promise<string> {
+    const desde = new Date();
+    desde.setDate(desde.getDate() - 7);
+    const [empleados, eventos7d, puntos, camaras, vision, database] = await Promise.all([
+      deps.enrollment.listSubjectsDetailed(),
+      deps.access.listEventsWithActor({ from: desde, limit: MAX_ANALYTICS_EVENTS }),
+      deps.accessPoints.list().catch((): AccessPointView[] => []),
+      deps.cameras.list().catch((): CameraView[] => []),
+      deps.vision.health().catch(() => ({ ok: false })),
+      deps.access.pingDb().catch(() => ({ ok: false })),
+    ]);
+
+    const granted = eventos7d.filter((e) => e.decision === 'GRANTED').length;
+    const denied = eventos7d.filter((e) => e.decision === 'DENIED').length;
+    const totalDecisiones = granted + denied;
+    const tasaDenegacion = totalDecisiones ? denied / totalDecisiones : 0;
+
+    // Motivo principal de denegación (por conteo).
+    const porMotivo = new Map<string, number>();
+    for (const e of eventos7d) {
+      if (e.decision === 'DENIED') porMotivo.set(e.reason, (porMotivo.get(e.reason) ?? 0) + 1);
+    }
+    let motivoPrincipal: string | null = null;
+    let motivoPrincipalCount = 0;
+    for (const [motivo, n] of porMotivo) {
+      if (n > motivoPrincipalCount) {
+        motivoPrincipal = motivo;
+        motivoPrincipalCount = n;
+      }
+    }
+
+    const sinBiometria = empleados.filter((e) => !e.hasBiometrics).length;
+    const pctSinBiometria = empleados.length ? Math.round((sinBiometria / empleados.length) * 100) : 0;
+
+    // ── criticalIssues: heurísticas explícitas ───────────────────────────
+    const criticalIssues: string[] = [];
+    if (camaras.length === 0) {
+      criticalIssues.push('No hay cámaras configuradas: el sistema no captura evidencia visual.');
+    } else if (camaras.filter((c) => c.status === 'ACTIVE').length === 0) {
+      criticalIssues.push('Las cámaras existen pero ninguna está activa.');
+    }
+    if (empleados.length > 0 && sinBiometria > 0) {
+      criticalIssues.push(`${pctSinBiometria}% de los empleados (${sinBiometria}) sin biometría: no pueden usar acceso facial.`);
+    }
+    if (totalDecisiones >= 5 && tasaDenegacion > 0.8) {
+      criticalIssues.push(
+        `Tasa de denegación anormal (${Math.round(tasaDenegacion * 100)}% en 7 días): revisa umbral facial o identidad de los usuarios.`,
+      );
+    }
+    if (!vision.ok) criticalIssues.push('El microservicio de visión no responde: el reconocimiento facial no funciona.');
+    if (!database.ok) criticalIssues.push('La base de datos no responde.');
+    if (motivoPrincipal === 'UNKNOWN_SUBJECT' && denied > 0) {
+      const pct = Math.round((motivoPrincipalCount / denied) * 100);
+      criticalIssues.push(
+        `La mayoría de las denegaciones (${pct}%) son por identidad desconocida (UNKNOWN_SUBJECT): posibles personas sin registrar o umbral facial muy estricto.`,
+      );
+    }
+    if (puntos.length === 0) criticalIssues.push('No hay puntos de acceso configurados.');
+
+    // Nivel de riesgo agregado, derivado de los issues (no inventado por el modelo).
+    const nivelRiesgo = criticalIssues.length >= 3 ? 'ALTO' : criticalIssues.length >= 1 ? 'MODERADO' : 'BAJO';
+
+    return JSON.stringify({
+      ventana: '7 días',
+      eventos: { granted, denied, total: eventos7d.length },
+      tasas: {
+        denegacion: Math.round(tasaDenegacion * 100) / 100,
+        concesion: totalDecisiones ? Math.round((granted / totalDecisiones) * 100) / 100 : 0,
+      },
+      motivoPrincipalDenegacion: motivoPrincipal ? { motivo: motivoPrincipal, count: motivoPrincipalCount } : null,
+      empleados: {
+        total: empleados.length,
+        withBiometrics: empleados.length - sinBiometria,
+        withoutBiometrics: sinBiometria,
+        pctSinBiometria,
+      },
+      doors: { total: puntos.length, activos: puntos.filter((p) => p.status === 'ACTIVE').length },
+      cameras: { total: camaras.length, activas: camaras.filter((c) => c.status === 'ACTIVE').length },
+      salud: { vision: vision.ok, baseDeDatos: database.ok },
+      nivelRiesgo,
+      criticalIssues,
+    });
+  }
+
+  async function execute(name: string, args: ToolArgs, ctx: ToolContext): Promise<ToolResult> {
     if (!names.has(name)) {
       return { ok: false, output: `error: herramienta desconocida ${name}` };
     }
@@ -335,6 +548,10 @@ export function createSystemTools(deps: SystemToolDeps) {
           return { ok: true, output: clip(await doorStatus(args)) };
         case 'estado_sistema':
           return { ok: true, output: clip(await systemStatus()) };
+        case 'novedades':
+          return { ok: true, output: clip(await novedades(ctx)) };
+        case 'resumen_operativo':
+          return { ok: true, output: clip(await operationalSummary()) };
         default:
           return { ok: false, output: `error: herramienta desconocida ${name}` };
       }
@@ -345,7 +562,7 @@ export function createSystemTools(deps: SystemToolDeps) {
     }
   }
 
-  return { schemas, execute };
+  return { schemas, execute, captureSnapshot };
 }
 
 function toInt(v: unknown): number | undefined {
