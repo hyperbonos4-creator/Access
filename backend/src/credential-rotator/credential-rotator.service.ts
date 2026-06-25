@@ -12,6 +12,8 @@ interface Account {
   isActive: boolean;
   lastUsed?: Date;
   failureCount: number;
+  /** Momento en que la cuenta fue desactivada (para reactivarla tras cooldown). */
+  disabledAt?: Date;
 }
 
 /**
@@ -47,7 +49,17 @@ export class CredentialRotatorService {
   private readonly logger = new Logger(CredentialRotatorService.name);
   private accounts: Account[] = [];
   private currentIndex = 0;
-  private readonly maxFailures = 3;
+  /** Fallos antes de desactivar una cuenta (leído de MAX_ACCOUNT_FAILURES). */
+  private readonly maxFailures: number;
+  /** Reactivar cuentas desactivadas tras este cooldown (ms). Por defecto 5 min. */
+  private readonly cooldownMs: number;
+  /**
+   * ¿Rotar automáticamente entre cuentas al recibir un fallo rotable? Con
+   * `AUTO_ROTATION_ENABLED=false` el rotador usa SOLO la cuenta actual: útil
+   * cuando se quiere fijar una única cuenta (p. ej. Workers Paid) y no tocar el
+   * pool. Por defecto `true` (comportamiento 24/7 clásico).
+   */
+  private readonly autoRotation: boolean;
   private readonly accountsPath: string;
   /** Plantilla de base URL de Workers AI; `{account_id}` se sustituye por cuenta. */
   private readonly baseUrlTemplate: string;
@@ -61,7 +73,22 @@ export class CredentialRotatorService {
     this.baseUrlTemplate =
       process.env.CLOUDFLARE_AI_BASE_TEMPLATE ??
       'https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1';
+    this.maxFailures = this.readIntEnv('MAX_ACCOUNT_FAILURES', 3);
+    // Cooldown de reactivación: cuánto debe pasar antes de volver a probar una
+    // cuenta desactivada (los rate-limits de Cloudflare suelen ser por minuto/hora).
+    this.cooldownMs = this.readIntEnv('ACCOUNT_COOLDOWN_MS', 5 * 60_000);
+    // Rotación automática: si está desactivada, se fija la cuenta actual y no se
+    // rota ante fallos (modo "cuenta única fija"). Default true.
+    this.autoRotation = (process.env.AUTO_ROTATION_ENABLED ?? 'true').toLowerCase() === 'true';
     this.loadAccounts();
+  }
+
+  /** Lee un entero de env con fallback; ignora valores no numéricos. */
+  private readIntEnv(name: string, fallback: number): number {
+    const raw = process.env[name];
+    if (!raw) return fallback;
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback;
   }
 
   private loadAccounts() {
@@ -129,7 +156,27 @@ export class CredentialRotatorService {
     };
   }
 
+  /**
+   * Reactiva cuentas cuyo cooldown ya expiró. Los rate-limits de Cloudflare son
+   * transitorios (por minuto/hora): sin esto, un pico de uso desactiva cuentas
+   * para SIEMPRE (hasta reiniciar el backend) y el pool se vacía hasta 0.
+   * Idempotente y barato: solo recorre el array en memoria.
+   */
+  private reactivateExpiredCooldowns(): void {
+    if (this.cooldownMs <= 0) return;
+    const now = Date.now();
+    for (const acc of this.accounts) {
+      if (!acc.isActive && acc.disabledAt && now - acc.disabledAt.getTime() >= this.cooldownMs) {
+        acc.isActive = true;
+        acc.failureCount = 0;
+        acc.disabledAt = undefined;
+        this.logger.log(`♻️ Cuenta reactivada tras cooldown: ${acc.email}`);
+      }
+    }
+  }
+
   async switchToNextAccount(): Promise<Account | null> {
+    this.reactivateExpiredCooldowns();
     const startIndex = this.currentIndex;
     const total = this.accounts.length;
 
@@ -155,7 +202,10 @@ export class CredentialRotatorService {
     account.failureCount++;
     if (account.failureCount >= this.maxFailures) {
       account.isActive = false;
-      this.logger.warn(`⛔ Cuenta desactivada ${account.email}: ${reason}`);
+      account.disabledAt = new Date();
+      this.logger.warn(
+        `⛔ Cuenta desactivada ${account.email}: ${reason} (se reactiva en ${Math.round(this.cooldownMs / 1000)}s)`,
+      );
     }
   }
 
@@ -235,6 +285,16 @@ export class CredentialRotatorService {
         lastError = error;
         if (!this.isRotatable(error)) throw error;
 
+        // Modo "cuenta única fija" (AUTO_ROTATION_ENABLED=false): no rotar.
+        // Se propaga el fallo tal cual; útil para fijar una sola cuenta Paid.
+        if (!this.autoRotation) {
+          const status = error?.status ?? error?.response?.status;
+          this.logger.warn(
+            `⚠️ Fallo rotable (${status}) en ${account.email} — AUTO_ROTATION_ENABLED=false, no se rota`,
+          );
+          throw error;
+        }
+
         const status = error?.status ?? error?.response?.status;
         this.logger.warn(`⚠️ Límite/fallo (${status}) en ${account.email}`);
         this.markCurrentAccountFailed(`HTTP ${status}`);
@@ -264,6 +324,9 @@ export class CredentialRotatorService {
       active: this.accounts.filter((a) => a.isActive).length,
       current: current?.email ?? null,
       currentAccountId: current?.account_id ?? null,
+      autoRotation: this.autoRotation,
+      cooldownMs: this.cooldownMs,
+      maxFailures: this.maxFailures,
       accounts: this.accounts.map((a) => ({
         email: a.email,
         accountId: a.account_id,
