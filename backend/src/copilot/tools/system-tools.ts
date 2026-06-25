@@ -87,7 +87,7 @@ export function createSystemTools(deps: SystemToolDeps) {
       function: {
         name: 'listar_eventos',
         description:
-          'Lista los eventos de acceso (concedidos/denegados) con decisión, motivo, puntuaje, si se abrió la puerta y hora. Soporta filtro por rango de fechas (desde/hasta), decisión y punto. Útil para "quién entró hoy", "denegaciones de la semana".',
+          'Lista los eventos de acceso (concedidos/denegados) con decisión, motivo, puntuaje, si se abrió la puerta, el operador que actuó (en aperturas manuales/prueba) y hora. Soporta filtro por rango de fechas (desde/hasta), decisión y punto. Útil para "quién entró hoy", "denegaciones de la semana", "quién abrió la puerta manualmente".',
         parameters: {
           type: 'object',
           properties: {
@@ -245,7 +245,7 @@ export function createSystemTools(deps: SystemToolDeps) {
 
   async function listEvents(args: ToolArgs): Promise<string> {
     const limit = Math.min(toInt(args.limit) ?? MAX_EVENTS, MAX_EVENTS);
-    const events = await deps.access.listEvents({
+    const events = await deps.access.listEventsWithActor({
       accessPointId: strOrUndef(args.accessPointId),
       decision: strOrUndef(args.decision),
       from: dateOrUndef(args.desde),
@@ -260,6 +260,7 @@ export function createSystemTools(deps: SystemToolDeps) {
       match: e.matchScore != null ? Number(e.matchScore) : null,
       liveness: e.livenessScore != null ? Number(e.livenessScore) : null,
       puertaAbierta: e.doorActuated,
+      operador: e.actor,
     }));
     return JSON.stringify({ total: rows.length, eventos: rows });
   }

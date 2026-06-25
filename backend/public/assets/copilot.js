@@ -194,7 +194,7 @@ function appendMessage(role, content, toolTrace) {
   const wrap = document.createElement('div');
   wrap.className = `cp-msg ${role}`;
   wrap.innerHTML = `
-    <div class="cp-msg__ava">${role === 'user' ? '🧑‍💼' : '🤖'}</div>
+    <div class="cp-msg__ava">${role === 'user' ? '🧑‍💼' : '<img src="assets/vx-bot.svg" alt="VisionYX" style="width:1.4em;height:1.4em">'} </div>
     <div class="cp-msg__bubble">${esc(content)}</div>`;
   host.appendChild(wrap);
   if (role === 'assistant' && Array.isArray(toolTrace) && toolTrace.length) {
@@ -230,7 +230,7 @@ function appendTyping() {
   const host = $('cp-messages');
   const wrap = document.createElement('div');
   wrap.className = 'cp-msg assistant';
-  wrap.innerHTML = `<div class="cp-msg__ava">🤖</div><div class="cp-msg__bubble cp-typing"><span></span><span></span><span></span></div>`;
+  wrap.innerHTML = `<div class="cp-msg__ava"><img src="assets/vx-bot.svg" alt="VisionYX" style="width:1.4em;height:1.4em"></div><div class="cp-msg__bubble cp-typing"><span></span><span></span><span></span></div>`;
   host.appendChild(wrap);
   scrollBottom();
   return wrap;

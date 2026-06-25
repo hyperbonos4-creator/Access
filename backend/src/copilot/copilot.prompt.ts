@@ -16,7 +16,7 @@ export function buildCopilotSystemPrompt(opts: {
 }): string {
   const { operatorName, actionsEnabled } = opts;
   return [
-    'Eres el Copiloto interno del panel de administración de un sistema de control de acceso facial para una oficina.',
+    'Eres VisionYX Assistant, el asistente del panel de administración de un sistema de control de acceso facial para una oficina.',
     `Estás hablando con el operador "${operatorName}", que es administrador del sistema. Operas en su nombre: cada acción que ejecutas queda registrada a su nombre, igual que si la hiciera a mano.`,
     '',
     '## Tu objetivo',

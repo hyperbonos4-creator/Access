@@ -21,6 +21,7 @@ import { DOOR_CONTROLLER } from './door/door-controller.port';
 import type { DoorControllerPort } from './door/door-controller.port';
 import { DoorStateService } from './door/door-state.service';
 import { TenantContext } from '../common/tenant/tenant-context.service';
+import { User } from '../auth/entities/user.entity';
 
 interface DecisionOutcome {
   decision: AccessDecision;
@@ -52,6 +53,8 @@ export class AccessControlService {
     private readonly accessEvents: Repository<AccessEvent>,
     @InjectRepository(EnrolledSubject)
     private readonly subjects: Repository<EnrolledSubject>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
     private readonly consents: ConsentService,
     @Inject(DOOR_CONTROLLER)
     private readonly door: DoorControllerPort,
@@ -289,6 +292,30 @@ export class AccessControlService {
       order: { recordedAt: 'DESC' },
       take: Math.min(filters.limit ?? 50, 200),
     });
+  }
+
+  /**
+   * Eventos enriquecidos con el **nombre del operador** que actuó la puerta
+   * (aperturas manuales / pruebas). Resuelve `actorId → "Nombre Apellido (rol)"`
+   * en una sola consulta a `users` por lote, para que el copiloto y la auditoría
+   * puedan responder "¿quién abrió la puerta?". Los eventos sin actor (reconoci-
+   * miento facial automático) dejan `actor` en `null`.
+   */
+  async listEventsWithActor(filters: {
+    accessPointId?: string;
+    decision?: string;
+    limit?: number;
+    from?: Date;
+    to?: Date;
+  } = {}): Promise<(AccessEvent & { actor: string | null })[]> {
+    const events = await this.listEvents(filters);
+    const actorIds = [...new Set(events.map((e) => e.actorId).filter(Boolean))] as string[];
+    const actors = new Map<string, string>();
+    if (actorIds.length) {
+      const users = await this.users.find({ where: { id: actorIds } as any });
+      for (const u of users) actors.set(u.id, `${u.firstName} ${u.lastName} (${u.role})`);
+    }
+    return events.map((e) => ({ ...e, actor: e.actorId ? actors.get(e.actorId) ?? null : null }));
   }
 
   // ── helpers ──────────────────────────────────────────────────────────
