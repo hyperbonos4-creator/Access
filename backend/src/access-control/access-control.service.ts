@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, LessThan, MoreThan, Repository } from 'typeorm';
+import { Between, In, LessThan, MoreThan, Repository } from 'typeorm';
 
 import { ConsentService } from './consent.service';
 import {
@@ -312,7 +312,7 @@ export class AccessControlService {
     const actorIds = [...new Set(events.map((e) => e.actorId).filter(Boolean))] as string[];
     const actors = new Map<string, string>();
     if (actorIds.length) {
-      const users = await this.users.find({ where: { id: actorIds } as any });
+      const users = await this.users.find({ where: { id: In(actorIds) } });
       for (const u of users) actors.set(u.id, `${u.firstName} ${u.lastName} (${u.role})`);
     }
     return events.map((e) => ({ ...e, actor: e.actorId ? actors.get(e.actorId) ?? null : null }));
