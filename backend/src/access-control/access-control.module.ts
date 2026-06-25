@@ -74,6 +74,13 @@ import { SubjectAuthorization } from './entities/subject-authorization.entity';
     DoorStateService,
     { provide: DOOR_CONTROLLER, useClass: DoorControllerService },
   ],
-  exports: [EnrollmentService, ConsentService, AccessControlService, VisionServiceClient],
+  exports: [
+    EnrollmentService,
+    ConsentService,
+    AccessControlService,
+    AccessPointsService,
+    KioskRecognitionService,
+    VisionServiceClient,
+  ],
 })
 export class AccessControlModule {}

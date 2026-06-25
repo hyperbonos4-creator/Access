@@ -87,4 +87,15 @@ export const envValidationSchema = Joi.object({
   ASSISTANT_TEMPERATURE: Joi.number().default(0.4),
   ASSISTANT_TIMEOUT_MS: Joi.number().default(22000),
   ASSISTANT_DISABLE_THINKING: Joi.string().valid('true', 'false').default('true'),
+
+  // ── Copiloto interno del panel de administración ─────────────────────
+  // Reutiliza el LlmProvider del asistente. ACTIONS_ENABLED=false => el
+  // copiloto opera en modo "solo lectura" (no publica abrir_puerta ni
+  // rotar_credenciales al modelo). REPO_ROOT confina la lectura de código.
+  COPLOT_ACTIONS_ENABLED: Joi.string().valid('true', 'false').default('true'),
+  COPLOT_REPO_ROOT: Joi.string().allow('').default(''),
+  COPLOT_MAX_ROUNDS: Joi.number().integer().min(1).max(10).default(6),
+  COPLOT_HISTORY_LIMIT: Joi.number().integer().min(2).max(40).default(12),
+  COPLOT_RATE_WINDOW_MS: Joi.number().integer().min(1000).default(60000),
+  COPLOT_RATE_MAX: Joi.number().integer().min(1).default(12),
 });

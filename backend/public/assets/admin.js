@@ -1,4 +1,5 @@
 import { api, ApiError, getToken, setToken, toast, fileToBase64 } from './api.js';
+import { initCopilot } from './copilot.js';
 
 const TOKEN_KEY = 'admin_token';
 const $ = (id) => document.getElementById(id);
@@ -138,6 +139,7 @@ function switchTab(tab) {
   if (tab === 'subjects') { loadPoints(); loadSubjects(); }
   if (tab === 'events') loadEvents();
   if (tab === 'system') loadDiagnostics();
+  if (tab === 'copilot') initCopilot(state.token);
 }
 
 function guard(e) {

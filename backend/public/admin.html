@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/theme.css?v=4" />
-  <link rel="stylesheet" href="assets/admin.css?v=5" />
+  <link rel="stylesheet" href="assets/admin.css?v=6" />
 </head>
 <body>
   <header class="admin-top">
@@ -32,6 +32,7 @@
       <button class="nav-item" data-tab="subjects"><span class="ni-ico">👤</span><span>Empleados</span></button>
       <button class="nav-item" data-tab="events"><span class="ni-ico">📋</span><span>Eventos</span></button>
       <button class="nav-item" data-tab="system"><span class="ni-ico">🩺</span><span>Sistema</span></button>
+      <button class="nav-item" data-tab="copilot"><span class="ni-ico">🤖</span><span>Copiloto</span></button>
       <div class="nav-foot">
         <div id="vision-health" class="pill">Vision —</div>
       </div>
@@ -287,6 +288,46 @@
         </div>
         <div id="sys-list" class="list"></div>
       </section>
+
+      <!-- Copiloto -->
+      <section id="tab-copilot" class="tab hidden">
+        <div class="copilot">
+          <!-- Sidebar de conversaciones -->
+          <aside class="card pad copilot-side">
+            <div class="spread" style="margin-bottom:10px">
+              <h3 style="margin:0">Conversaciones</h3>
+              <button id="cp-new" class="btn sm" title="Nueva conversación">+ Nueva</button>
+            </div>
+            <div id="cp-conv-list" class="cp-conv-list"></div>
+          </aside>
+
+          <!-- Panel de chat -->
+          <div class="card copilot-chat">
+            <div class="copilot-top spread">
+              <div>
+                <b>Copiloto interno</b>
+                <p class="sub" style="margin:2px 0 0">Consulta el sistema y, si lo autorizas, ejecuta acciones. Cada acción queda auditada a tu nombre.</p>
+              </div>
+              <span id="cp-badge" class="pill hidden"></span>
+            </div>
+            <div id="cp-messages" class="cp-messages">
+              <div class="cp-empty">
+                <div class="cp-empty__ico">🤖</div>
+                <p>Pregúntame por el estado del sistema, los últimos accesos, la salud de los servicios… o cómo funciona algo del código.</p>
+                <div class="cp-suggest">
+                  <button class="btn ghost sm cp-sug">¿Hubo accesos denegados hoy?</button>
+                  <button class="btn ghost sm cp-sug">¿En qué estado está la puerta?</button>
+                  <button class="btn ghost sm cp-sug">¿El sistema está saludable?</button>
+                </div>
+              </div>
+            </div>
+            <form id="cp-form" class="cp-form">
+              <textarea id="cp-input" rows="1" placeholder="Escribe tu mensaje… (Enter para enviar, Mayús+Enter para salto)" autocomplete="off"></textarea>
+              <button id="cp-send" class="btn" type="submit">Enviar</button>
+            </form>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -325,6 +366,6 @@
   </div>
 
   <script src="assets/demo-banner.js?v=1"></script>
-  <script type="module" src="assets/admin.js?v=7"></script>
+  <script type="module" src="assets/admin.js?v=8"></script>
 </body>
 </html>

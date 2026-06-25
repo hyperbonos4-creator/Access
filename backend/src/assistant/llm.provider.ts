@@ -6,13 +6,52 @@ import {
   type AccountConnection,
 } from '../credential-rotator/credential-rotator.service';
 
+/** Una llamada a herramienta emitida por el modelo (formato OpenAI). */
+export interface ToolCall {
+  id: string;
+  type: 'function';
+  function: { name: string; arguments: string };
+}
+
+/**
+ * Mensaje de chat. El copiloto interno usa los campos opcionales
+ * (`tool_calls`, `tool_call_id`, `name`) para el bucle de function-calling;
+ * "Vix" solo usa `role`+`content`.
+ */
 export interface ChatMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
+  /** Solo en mensajes assistant cuando el modelo pide ejecutar herramientas. */
+  tool_calls?: ToolCall[];
+  /** Solo en mensajes `role:'tool'`, para emparejar con la llamada. */
+  tool_call_id?: string;
+  /** Nombre de la herramienta (mensajes `tool`). */
+  name?: string;
+}
+
+/** Esquema de herramienta expuesto al modelo (function-calling OpenAI-compatible). */
+export interface ToolSchema {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
+export interface ChatOptions {
+  /** Si se pasan, se habilita el function-calling (bucle agéntico). */
+  tools?: ToolSchema[];
+  /** Modelo a usar para este turno (por defecto ASSISTANT_MODEL). */
+  model?: string;
+  /** Tope de tokens para este turno (por defecto ASSISTANT_MAX_TOKENS). */
+  maxTokens?: number;
 }
 
 export interface LlmReply {
   content: string;
+  /** Llamadas a herramientas pedidas por el modelo (vacío si no usó tools). */
+  toolCalls?: ToolCall[];
   usage?: { prompt: number; completion: number } | null;
   /** Email de la cuenta Cloudflare con la que se respondió (o null si env). */
   account?: string | null;
@@ -63,19 +102,30 @@ export class LlmProvider {
   }
 
   /** Un turno de chat. Devuelve el texto del asistente y la cuenta usada. */
-  async chat(messages: ChatMessage[]): Promise<LlmReply> {
+  async chat(messages: ChatMessage[], options?: ChatOptions): Promise<LlmReply> {
     if (!this.configured) throw new Error('assistant_not_configured');
+
+    const tools = options?.tools;
+    const model = options?.model;
+    const maxTokens = options?.maxTokens;
 
     // Modo pool: rota entre cuentas Cloudflare ante límite/cuota/auth.
     if (this.rotator.hasAccounts()) {
       const reply = await this.rotator.executeWithRotation((conn: AccountConnection) =>
-        this.doChat(conn.baseUrl, conn.token, messages),
+        this.doChat(conn.baseUrl, conn.token, messages, tools, model, maxTokens),
       );
       return { ...reply, account: this.rotator.getCurrentAccount()?.email ?? null };
     }
 
     // Modo env (cuenta única).
-    const reply = await this.doChat(this.envBaseUrl, this.envApiKey, messages);
+    const reply = await this.doChat(
+      this.envBaseUrl,
+      this.envApiKey,
+      messages,
+      tools,
+      model,
+      maxTokens,
+    );
     return { ...reply, account: null };
   }
 
@@ -87,18 +137,28 @@ export class LlmProvider {
     baseUrl: string,
     apiKey: string,
     messages: ChatMessage[],
+    tools?: ToolSchema[],
+    model?: string,
+    maxTokens?: number,
   ): Promise<LlmReply> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     const payload: Record<string, unknown> = {
-      model: this.model,
+      model: model ?? this.model,
       messages,
       temperature: this.temperature,
-      max_tokens: this.maxTokens,
+      max_tokens: maxTokens ?? this.maxTokens,
       stream: false,
     };
-    // Desactiva el razonamiento del modelo (GLM) para respuestas directas y rápidas.
-    if (this.disableThinking) payload.chat_template_kwargs = { enable_thinking: false };
+    // Function-calling (copiloto interno). Si hay tools, NO desactivamos el
+    // thinking: la cadena de razonamiento mejora la elección de herramientas.
+    if (tools && tools.length) {
+      payload.tools = tools;
+      payload.tool_choice = 'auto';
+    } else if (this.disableThinking) {
+      // Desactiva el razonamiento del modelo (GLM) para respuestas directas y rápidas.
+      payload.chat_template_kwargs = { enable_thinking: false };
+    }
     let res: Response;
     try {
       res = await fetch(`${baseUrl}/chat/completions`, {
@@ -132,12 +192,20 @@ export class LlmProvider {
     }
 
     const data = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
+      choices?: Array<{
+        message?: {
+          content?: string;
+          tool_calls?: ToolCall[];
+        };
+      }>;
       usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
-    const raw = data?.choices?.[0]?.message?.content ?? '';
+    const msg = data?.choices?.[0]?.message;
+    const raw = msg?.content ?? '';
+    const toolCalls = msg?.tool_calls?.length ? msg.tool_calls : undefined;
     return {
       content: stripThinking(raw),
+      toolCalls,
       usage: data?.usage
         ? {
             prompt: Number(data.usage.prompt_tokens ?? 0),

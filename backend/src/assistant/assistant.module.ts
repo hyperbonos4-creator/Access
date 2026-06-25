@@ -13,5 +13,8 @@ import { LlmProvider } from './llm.provider';
   imports: [ConfigModule],
   controllers: [AssistantController],
   providers: [AssistantService, LlmProvider],
+  // LlmProvider se exporta para que el Copiloto interno lo reutilice (mismo
+  // modelo GLM + rotación de cuentas Cloudflare). "Vix" no se ve afectado.
+  exports: [LlmProvider],
 })
 export class AssistantModule {}

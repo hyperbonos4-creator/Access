@@ -94,6 +94,10 @@ services:
       DB_SYNCHRONIZE: "true"
       VISION_SERVICE_URL: http://vision:8200
       CUENTAS_PATH: /app/cuentas/cuentas.json
+      # Copiloto: raíz del repo que puede LEER (read-only). Las tools de código
+      # (listar_archivos / leer_archivo / buscar_en_codigo) se confinan aquí y
+      # rechazan cualquier path-traversal. Monta el repo ro en /repo (ver volumes).
+      COPLOT_REPO_ROOT: /repo
     ports:
       - "3010:3000"
     volumes:
@@ -101,6 +105,10 @@ services:
       - ./backend/public:/app/public:ro
       # Credenciales del rotador (tokens) montadas, no horneadas en la imagen.
       - ./cuentas:/app/cuentas:ro
+      # Copiloto: el repo entero montado SOLO LECTURA en /repo, para que las tools
+      # de código inspeccionen el proyecto sin riesgo de escritura. :ro garantiza
+      # que, aunque una tool tuviese un bug, no podría modificar el código.
+      - ./:/repo:ro
     depends_on:
       postgres:
         condition: service_healthy

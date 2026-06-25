@@ -13,6 +13,7 @@ import { AccessControlModule } from './access-control/access-control.module';
 import { TenantModule } from './common/tenant/tenant.module';
 import { AssistantModule } from './assistant/assistant.module';
 import { CredentialRotatorModule } from './credential-rotator/credential-rotator.module';
+import { CopilotModule } from './copilot/copilot.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { CredentialRotatorModule } from './credential-rotator/credential-rotator
     TenantModule,
     AssistantModule,
     CredentialRotatorModule,
+    CopilotModule,
   ],
   controllers: [AppController],
 })
