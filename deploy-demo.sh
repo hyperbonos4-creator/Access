@@ -36,6 +36,13 @@ VISION_SERVICE_TIMEOUT_MS=8000
 VISION_ACTIVE_LIVENESS_TIMEOUT_MS=45000
 CAMERA_ISAPI_PORT=80
 FAMILY_STREAM_SECRET=
+
+# --- Rotador de cuentas Cloudflare (asistente / copiloto) ---
+AUTO_ROTATION_ENABLED=true
+MAX_ACCOUNT_FAILURES=3
+ACCOUNT_COOLDOWN_MS=300000
+# Seed: fuerza la reescritura de la clave del admin en cada deploy del demo.
+FORCE_RESEED_ADMIN=true
 EOF
 
 cat > vision/.env <<EOF

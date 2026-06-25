@@ -5,14 +5,21 @@ import { AppDataSource } from './data-source';
 import { User, UserRole } from '../auth/entities/user.entity';
 
 /**
- * Crea el usuario administrador inicial a partir de SEED_ADMIN_EMAIL /
- * SEED_ADMIN_PASSWORD. Idempotente: si ya existe, no hace nada.
+ * Crea (o actualiza) el usuario administrador a partir de SEED_ADMIN_EMAIL /
+ * SEED_ADMIN_PASSWORD.
+ *
+ * - Por defecto es **idempotente**: si el admin ya existe, no hace nada.
+ * - Con `FORCE_RESEED_ADMIN=true` hace **upsert**: si existe, reescribe la
+ *   contraseña (y la reactiva). Es lo que permite cambiar la clave del admin
+ *   sin recrear la base ni tocar SQL a mano.
  *
  *   npm run seed
+ *   FORCE_RESEED_ADMIN=true npm run seed   # fuerza el update de la clave
  */
 async function seed(): Promise<void> {
   const email = (process.env.SEED_ADMIN_EMAIL ?? 'admin@office.local').trim().toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe123!';
+  const forceReseed = (process.env.FORCE_RESEED_ADMIN ?? '').toLowerCase() === 'true';
 
   await AppDataSource.initialize();
 
@@ -23,16 +30,27 @@ async function seed(): Promise<void> {
   }
 
   const users = AppDataSource.getRepository(User);
+  const passwordHash = await bcrypt.hash(password, 12);
 
   const existing = await users.findOne({ where: { email } });
   if (existing) {
+    if (!forceReseed) {
+      // eslint-disable-next-line no-console
+      console.log(`Admin ya existe: ${email} (usa FORCE_RESEED_ADMIN=true para reescribir la clave)`);
+      await AppDataSource.destroy();
+      return;
+    }
+    // FORCE_RESEED_ADMIN: actualiza contraseña y reactiva el admin.
+    existing.passwordHash = passwordHash;
+    existing.isActive = true;
+    existing.role = UserRole.ADMIN;
+    await users.save(existing);
     // eslint-disable-next-line no-console
-    console.log(`Admin ya existe: ${email}`);
+    console.log(`Admin actualizado (FORCE_RESEED_ADMIN): ${email}`);
     await AppDataSource.destroy();
     return;
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
   const admin = users.create({
     email,
     passwordHash,
