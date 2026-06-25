@@ -287,16 +287,21 @@
 @media (max-width: 520px) { .dash-kpis { grid-template-columns: 1fr; } }
 
 /* ── Copiloto ────────────────────────────────────────────────────────────── */
+/* Altura FIJA (no min-height): así el grid acota a las columnas y el scroll
+   interno de .cp-messages funciona en su propia caja, sin estirar la página. */
 .copilot {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 18px;
-  min-height: 72vh;
+  height: calc(100vh - 96px);
+  min-height: 460px;
 }
-@media (max-width: 880px) { .copilot { grid-template-columns: 1fr; } }
+@media (max-width: 880px) {
+  .copilot { grid-template-columns: 1fr; height: auto; min-height: 0; }
+}
 
 .copilot-side { display: flex; flex-direction: column; min-height: 0; }
-.cp-conv-list { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; max-height: 64vh; }
+.cp-conv-list { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex: 1; min-height: 0; }
 .cp-conv {
   display: flex; flex-direction: column; gap: 2px; cursor: pointer; text-align: left;
   background: transparent; border: 1px solid var(--border); border-radius: 12px;
@@ -342,6 +347,9 @@
 .cp-tool__dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px; }
 .cp-tool__dot.ok { background: var(--ok); box-shadow: 0 0 6px var(--ok-glow); }
 .cp-tool__dot.err { background: var(--danger); box-shadow: 0 0 6px var(--danger-glow); }
+.cp-tool__status { margin-left: auto; font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; }
+.cp-tool__status.ok { color: var(--ok); background: rgba(40, 224, 160, 0.12); }
+.cp-tool__status.err { color: var(--danger); background: rgba(255, 84, 112, 0.12); }
 .cp-tool details { margin-left: 4px; }
 .cp-tool summary { cursor: pointer; color: var(--text-faint); font-size: 11px; list-style: none; }
 .cp-tool summary::-webkit-details-marker { display: none; }

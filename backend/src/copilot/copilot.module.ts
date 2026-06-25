@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AccessControlModule } from '../access-control/access-control.module';
+import { CamerasModule } from '../cameras/cameras.module';
 import { AssistantModule } from '../assistant/assistant.module';
 // CredentialRotatorModule es @Global: su servicio ya está disponible sin import.
 
@@ -25,6 +26,9 @@ import { CopilotAudit } from './entities/copilot-audit.entity';
   imports: [
     AssistantModule,
     AccessControlModule,
+    // CamerasModule exporta CamerasService (necesario para la tool listar_camaras).
+    // AccessControlModule lo importa internamente, pero no lo re-exporta.
+    CamerasModule,
     TypeOrmModule.forFeature([CopilotConversation, CopilotMessage, CopilotAudit]),
   ],
   controllers: [CopilotController],

@@ -3,19 +3,19 @@ import { ConfigService } from '@nestjs/config';
 
 import { AccessControlService } from '../../access-control/access-control.service';
 import { AccessPointsService } from '../../access-control/access-points.service';
+import { EnrollmentService } from '../../access-control/enrollment.service';
 import { KioskRecognitionService } from '../../access-control/kiosk-recognition.service';
 import { VisionServiceClient } from '../../access-control/vision-service.client';
+import { CamerasService } from '../../cameras/cameras.service';
 import { CredentialRotatorService } from '../../credential-rotator/credential-rotator.service';
 import type { ToolSchema } from '../../assistant/llm.provider';
 
-import { createCodeTools, type ToolResult } from './code-tools';
 import { createSystemTools, type SystemToolDeps } from './system-tools';
 import { createActionTools, type ActionToolDeps } from './action-tools';
-
-type ToolArgs = Record<string, unknown>;
+import type { ToolArgs, ToolResult } from './tools.types';
 
 /** Marca de cada familia, para auditar/limitar por categoría si hace falta. */
-export type ToolFamily = 'code' | 'system' | 'action';
+export type ToolFamily = 'system' | 'action';
 
 /** Entrada del registro: familia + ejecutor atribuido al usuario. */
 interface ToolEntry {
@@ -27,10 +27,10 @@ interface ToolEntry {
 /**
  * `ToolsRegistry` — catálogo central de herramientas del Copiloto.
  *
- * Reúne los esquemas (OpenAI function-calling) de las tres familias —código,
- * sistema, acción— y los despacha por nombre, pasando siempre el `userId` del
- * admin (atribución). Es el único punto por el que el bucle agéntico llama a
- * una tool, lo que permite:
+ * Reúne los esquemas (OpenAI function-calling) de las dos familias —sistema y
+ * acción— y los despacha por nombre, pasando siempre el `userId` del admin
+ * (atribución). Es el único punto por el que el bucle agéntico llama a una tool,
+ * lo que permite:
  *  - publicar al modelo solo los esquemas habilitados (las actions desaparecen
  *    del menú si `COPLOT_ACTIONS_ENABLED=false`),
  *  - y delegar la auditoría al servicio, que recibe `{ family, ok, output }`.
@@ -49,25 +49,17 @@ export class ToolsRegistry {
     config: ConfigService,
     access: AccessControlService,
     accessPoints: AccessPointsService,
+    enrollment: EnrollmentService,
+    cameras: CamerasService,
     kiosk: KioskRecognitionService,
     vision: VisionServiceClient,
     rotator: CredentialRotatorService,
   ) {
     this.actionsEnabled = config.get<string>('COPLOT_ACTIONS_ENABLED', 'true') !== 'false';
 
-    // 1) Código — lectura del repositorio (read-only), confinada a COPLOT_REPO_ROOT.
-    const repoRoot = config.get<string>('COPLOT_REPO_ROOT') || process.cwd();
-    const code = createCodeTools(repoRoot);
-    for (const s of code.schemas) {
-      this.entries.set(s.function.name, {
-        family: 'code',
-        run: (args) => code.execute(s.function.name, args),
-      });
-    }
-    this.schemas.push(...code.schemas);
-
-    // 2) Sistema — consultas de estado del control de acceso.
-    const sysDeps: SystemToolDeps = { access, accessPoints, kiosk, vision, rotator };
+    // 1) Sistema — consultas de solo lectura sobre todo el control de acceso
+    //    (empleados, eventos, puntos, cámaras, puerta, salud, credenciales).
+    const sysDeps: SystemToolDeps = { access, accessPoints, enrollment, cameras, kiosk, vision, rotator };
     const system = createSystemTools(sysDeps);
     for (const s of system.schemas) {
       this.entries.set(s.function.name, {
@@ -77,7 +69,7 @@ export class ToolsRegistry {
     }
     this.schemas.push(...system.schemas);
 
-    // 3) Acción — mutaciones (puerta, credenciales). Solo si están habilitadas:
+    // 2) Acción — mutaciones (puerta, credenciales). Solo si están habilitadas:
     //    si no, no se registran entradas ni se publican esquemas, de modo que la
     //    tool es inalcanzable para el modelo aunque "decida" llamarla.
     if (this.actionsEnabled) {

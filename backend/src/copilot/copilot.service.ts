@@ -108,7 +108,7 @@ export class CopilotService {
       rounds++;
       let reply;
       try {
-        reply = await this.llm.chat(messages, { tools, maxTokens: 900 });
+        reply = await this.llm.chat(messages, { tools, maxTokens: 600 });
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         this.logger.warn(`LLM falló en ronda ${rounds}: ${msg}`);

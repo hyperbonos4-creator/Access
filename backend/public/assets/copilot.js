@@ -19,15 +19,15 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 
 /* Icono + etiqueta legible por nombre de herramienta (la traza usa el nombre técnico). */
 const TOOL_META = {
-  list_events: ['🎫', 'Accesos'],
-  diagnostics: ['🩺', 'Diagnóstico'],
-  door_status: ['🚪', 'Estado de puerta'],
-  credentials_status: ['🔑', 'Credenciales'],
-  read_file: ['📄', 'Leer archivo'],
-  list_files: ['📂', 'Listar archivos'],
-  search_code: ['🔍', 'Buscar código'],
-  open_door: ['🔓', 'Abrir puerta'],
-  rotate_credentials: ['🔄', 'Rotar credenciales'],
+  panel: ['📊', 'Resumen'],
+  listar_empleados: ['👤', 'Empleados'],
+  listar_eventos: ['🎫', 'Accesos'],
+  listar_puntos_acceso: ['🚪', 'Puntos de acceso'],
+  listar_camaras: ['📷', 'Cámaras'],
+  estado_puerta: ['🚪', 'Estado de puerta'],
+  estado_sistema: ['🩺', 'Sistema'],
+  abrir_puerta: ['🔓', 'Abrió puerta'],
+  rotar_credenciales: ['🔄', 'Rotó credenciales'],
 };
 
 const state = {
@@ -41,10 +41,11 @@ const state = {
 /** Punto de entrada: lo llama admin.js al entrar en la pestaña Copiloto. */
 export function initCopilot(token) {
   state.token = token;
-  if (state.ready) { refreshConversations(); return; }
+  if (state.ready) { refreshConversations(); scrollBottom(); return; }
   state.ready = true;
   bind();
   refreshConversations();
+  scrollBottom();
 }
 
 function bind() {
@@ -70,6 +71,7 @@ function newConversation() {
   renderConversations();
   renderEmpty();
   $('cp-input').focus();
+  scrollBottom();
 }
 
 /* ── Conversaciones (sidebar) ────────────────────────────────────────────── */
@@ -151,6 +153,7 @@ async function send(text) {
   // Limpia el estado vacío y pinta el mensaje del usuario.
   if (!$('cp-messages').querySelector('.cp-msg')) $('cp-messages').innerHTML = '';
   appendMessage('user', text);
+  scrollBottom();
   $('cp-input').value = '';
   autosize();
   const typing = appendTyping();
@@ -200,7 +203,9 @@ function appendMessage(role, content, toolTrace) {
   return wrap;
 }
 
-/** Traza de herramientas de un turno del asistente (plegable por tool). */
+/** Traza de herramientas de un turno del asistente. Chip discreto colapsado:
+ *  muestra solo icono + nombre + estado; el detalle (args/resultado) queda
+ *  plegado para que el admin lo abra solo si quiere, sin saturar el chat. */
 function renderTrace(trace) {
   const el = document.createElement('div');
   el.className = 'cp-trace';
@@ -208,11 +213,12 @@ function renderTrace(trace) {
     .map((t) => {
       const [ico, label] = TOOL_META[t.tool] || ['🛠', t.tool];
       const okCls = t.ok ? 'ok' : 'err';
+      const okTxt = t.ok ? '✓' : '✗';
       const detail = `<pre>args: ${esc(fmtJson(t.args))}\n\nresultado:\n${esc(t.result)}</pre>`;
       return `<div class="cp-tool">
         <span class="cp-tool__ico">${ico}</span>
         <span class="cp-tool__name">${esc(label)}</span>
-        <span class="cp-tool__dot ${okCls}" title="${t.ok ? 'OK' : 'Falló'}"></span>
+        <span class="cp-tool__status ${okCls}">${okTxt}</span>
         <details><summary>detalle</summary>${detail}</details>
       </div>`;
     })
@@ -234,14 +240,15 @@ function renderEmpty() {
   $('cp-messages').innerHTML = `
     <div class="cp-empty">
       <div class="cp-empty__ico">🤖</div>
-      <p>Pregúntame por el estado del sistema, los últimos accesos, la salud de los servicios… o cómo funciona algo del código.</p>
+      <p>Pregúntame por el estado del sistema: empleados, accesos, cámaras, puntos de acceso o la salud de los servicios.</p>
       <div class="cp-suggest">
-        <button class="btn ghost sm cp-sug">¿Hubo accesos denegados hoy?</button>
-        <button class="btn ghost sm cp-sug">¿En qué estado está la puerta?</button>
+        <button class="btn ghost sm cp-sug">¿Cuántos empleados hay registrados?</button>
+        <button class="btn ghost sm cp-sug">¿Cuántas entradas hubo hoy?</button>
         <button class="btn ghost sm cp-sug">¿El sistema está saludable?</button>
       </div>
     </div>`;
   document.querySelectorAll('.cp-sug').forEach((b) => (b.onclick = () => send(b.textContent.trim())));
+  scrollBottom();
 }
 
 /* ── Utilidades ──────────────────────────────────────────────────────────── */

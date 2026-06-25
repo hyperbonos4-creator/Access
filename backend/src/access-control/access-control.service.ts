@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, LessThan, MoreThan, Repository } from 'typeorm';
 
 import { ConsentService } from './consent.service';
 import {
@@ -260,13 +260,30 @@ export class AccessControlService {
     }
   }
 
-  /** Feed/histórico de eventos de acceso, paginado. */
+  /**
+   * Feed/histórico de eventos de acceso, paginado. Los filtros `from`/`to`
+   * (fechas) acotan por `recordedAt`; si llegan ambos, usa `Between`. No rompe
+   * a los callers que solo pasan `accessPointId`/`decision`/`limit`.
+   */
   listEvents(
-    filters: { accessPointId?: string; decision?: string; limit?: number } = {},
+    filters: {
+      accessPointId?: string;
+      decision?: string;
+      limit?: number;
+      from?: Date;
+      to?: Date;
+    } = {},
   ): Promise<AccessEvent[]> {
     const where: Record<string, unknown> = { demoSessionId: this.tenant.scopeValue() };
     if (filters.accessPointId) where.accessPointId = filters.accessPointId;
     if (filters.decision) where.decision = filters.decision;
+    if (filters.from && filters.to) {
+      where.recordedAt = Between(filters.from, filters.to);
+    } else if (filters.from) {
+      where.recordedAt = MoreThan(filters.from);
+    } else if (filters.to) {
+      where.recordedAt = LessThan(filters.to);
+    }
     return this.accessEvents.find({
       where,
       order: { recordedAt: 'DESC' },

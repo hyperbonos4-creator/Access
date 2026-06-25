@@ -4,9 +4,7 @@ import { AccessControlService } from '../../access-control/access-control.servic
 import { AccessPointsService } from '../../access-control/access-points.service';
 import { CredentialRotatorService } from '../../credential-rotator/credential-rotator.service';
 import type { ToolSchema } from '../../assistant/llm.provider';
-import type { ToolResult } from './code-tools';
-
-type ToolArgs = Record<string, unknown>;
+import type { ToolArgs, ToolResult } from './tools.types';
 
 /** Dependencias que el módulo del copiloto inyecta en las tools de acción. */
 export interface ActionToolDeps {
