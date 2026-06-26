@@ -348,7 +348,9 @@ cd ~/access-demo
 rsync -a --delete ~/access/backend/src/ backend/src/
 
 # (b) Si cambió la UI (admin/kiosko/enroll + assets) → sincroniza public:
-rsync -a ~/access/backend/public/ public/
+# OJO: el contenedor monta ./backend/public como volumen :ro, así que el destino
+# debe ser backend/public/ (no un public/ plano), o el contenedor sirve UI vieja.
+rsync -a ~/access/backend/public/ backend/public/
 
 # (c) Si además cambió vision → sincroniza vision/app:
 rsync -a --delete ~/access/vision/app/ vision/app/

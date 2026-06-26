@@ -257,8 +257,10 @@ echo "== sincronizar repo → demo (rsync, solo deltas) =="
 cd "$DEMO"
 # backend TS: reemplazo total (--delete) para no dejar archivos muertos.
 rsync -a --delete "$REPO/backend/src/" backend/src/
-# UI: montada como volumen :ro; se copia sin --delete para no tocar extras.
-rsync -a           "$REPO/backend/public/" public/
+# UI: montada como volumen :ro EN backend/public (ver docker-compose.yml). El
+# target debe coincidir con el mount del contenedor (./backend/public), no un
+# public/ plano, o el contenedor seguiría sirviendo la UI vieja.
+rsync -a           "$REPO/backend/public/" backend/public/
 # vision: reemplazo total del código Python.
 rsync -a --delete "$REPO/vision/app/"   vision/app/
 # compose: del repo, forzando el backend a loopback (nginx es el front público).
