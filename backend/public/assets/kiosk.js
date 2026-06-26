@@ -41,11 +41,31 @@ const state = {
 const MAX_BACKOFF_MS = 15000;
 
 /* ── Arranque ───────────────────────────────────────────────────────────── */
+consumeAutoLoginToken();
 bindEvents();
 if (!state.token) {
   show('modal-login');
 } else {
   init();
+}
+
+/* Auto-login del demo: si la URL trae `#t=<jwt>` (y opcionalmente `&p=<pointId>`),
+   adopta la sesión sin pedir login y limpia el hash. El token viaja en el
+   fragmento (#), que el navegador NO envía al servidor. */
+function consumeAutoLoginToken() {
+  if (!location.hash || location.hash.length < 2) return;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const t = params.get('t');
+  const p = params.get('p');
+  if (t) {
+    setToken(TOKEN_KEY, t);
+    state.token = t;
+  }
+  if (p) {
+    state.pointId = p;
+    localStorage.setItem(POINT_KEY, p);
+  }
+  history.replaceState(null, '', location.pathname + location.search);
 }
 
 function bindEvents() {

@@ -6,6 +6,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, LessThanOrEqual, Repository } from 'typeorm';
 import { randomBytes, randomUUID } from 'node:crypto';
@@ -27,6 +28,12 @@ export interface DemoSessionTicket {
   sessionId: string;
   email: string;
   password: string;
+  /**
+   * Access token JWT ya emitido para la sesión, con TTL = TTL de la sesión.
+   * Permite **entrar sin teclear credenciales** (auto-login) y garantiza que el
+   * token caduque exactamente cuando la sesión expira (no puede sobrevivirla).
+   */
+  token: string;
   displayName: string;
   pointId: string;
   expiresAt: string;
@@ -71,6 +78,7 @@ export class DemoSessionService implements OnModuleInit, OnModuleDestroy {
     private readonly consents: Repository<BiometricConsent>,
     private readonly vision: VisionServiceClient,
     private readonly tenant: TenantContext,
+    private readonly jwt: JwtService,
     config: ConfigService,
   ) {
     this.enabled = config.get<string>('DEMO_MODE', 'false') === 'true';
@@ -131,7 +139,7 @@ export class DemoSessionService implements OnModuleInit, OnModuleDestroy {
     );
 
     // 2) Usuario ADMIN propio de la sesión (credenciales únicas).
-    await this.users.save(
+    const user = await this.users.save(
       this.users.create({
         email,
         passwordHash,
@@ -162,11 +170,21 @@ export class DemoSessionService implements OnModuleInit, OnModuleDestroy {
     session.accessPointId = point.id;
     await this.sessions.save(session);
 
+    // 4) Token de auto-login: mismo claim que el login normal (`ds` aísla el
+    // tenant), pero con TTL = TTL de la sesión. Así el visitante entra al panel
+    // y al kiosko SIN teclear credenciales y, además, el token **muere cuando la
+    // sesión expira** (no puede usarse en la ventana previa al barrido de purga).
+    const token = this.jwt.sign(
+      { sub: user.id, email: user.email, role: user.role, ds: sessionId },
+      { expiresIn: `${this.ttlMinutes}m` },
+    );
+
     this.logger.log(`Demo aprovisionado: ${email} (sesión ${sessionId}, expira ${expiresAt.toISOString()})`);
     return {
       sessionId,
       email,
       password,
+      token,
       displayName,
       pointId: point.id,
       expiresAt: expiresAt.toISOString(),

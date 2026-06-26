@@ -38,9 +38,25 @@ const state = {
 boot();
 
 function boot() {
+  consumeAutoLoginToken();
   bindGlobal();
   if (!state.token) show('modal-login');
   else init();
+}
+
+/* Auto-login del demo: si la URL trae `#t=<jwt>` (enlace generado por la web del
+   demo), lo adopta como sesión y limpia el hash. Evita teclear credenciales. El
+   token viaja en el fragmento (#), que el navegador NO envía al servidor. */
+function consumeAutoLoginToken() {
+  if (!location.hash || location.hash.length < 2) return;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const t = params.get('t');
+  if (t) {
+    setToken(TOKEN_KEY, t);
+    state.token = t;
+  }
+  // Borra el token de la barra de direcciones (no queda en el historial).
+  history.replaceState(null, '', location.pathname + location.search);
 }
 
 function bindGlobal() {

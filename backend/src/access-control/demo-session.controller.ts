@@ -21,6 +21,7 @@ export class DemoSessionController {
       sessionId: t.sessionId,
       email: t.email,
       password: t.password,
+      token: t.token,
       displayName: t.displayName,
       pointId: t.pointId,
       expiresAt: t.expiresAt,

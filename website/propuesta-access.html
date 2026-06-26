@@ -1348,8 +1348,14 @@
         $('live-state').style.display = 'block';
         $('cred-user').textContent = tk.email;
         $('cred-pass').textContent = tk.password;
-        $('lnk-admin').href = KIOSK + '/admin.html';
-        $('lnk-kiosk').href = KIOSK + '/';
+        // Auto-login: el token viaja en el fragmento (#), que no llega al
+        // servidor. El panel/kiosko lo adoptan y entran sin teclear credenciales.
+        var auth = tk.token ? '#t=' + encodeURIComponent(tk.token) : '';
+        var kioskAuth = tk.token
+          ? '#t=' + encodeURIComponent(tk.token) + (tk.pointId ? '&p=' + encodeURIComponent(tk.pointId) : '')
+          : '';
+        $('lnk-admin').href = KIOSK + '/admin.html' + auth;
+        $('lnk-kiosk').href = KIOSK + '/' + kioskAuth;
         $('ttl-sub').textContent = 'Se autodestruye en ' + tk.ttlMinutes + ' minutos. Al expirar se borra todo: su rostro y sus datos.';
         var fab = $('demo-fab');
         if (fab) { fab.classList.add('active'); fab.innerHTML = '<span class="dot"></span> Demo activo · ' + fmt(new Date(tk.expiresAt).getTime() - Date.now()); }

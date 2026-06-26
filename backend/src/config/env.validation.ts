@@ -79,7 +79,7 @@ export const envValidationSchema = Joi.object({
 
   // ── Asistente de la web ("Vix") — GLM vía Cloudflare Workers AI ─────
   // OpenAI-compatible: BASE_URL = https://api.cloudflare.com/client/v4/accounts/<id>/ai/v1
-  // MODEL = @cf/zai-org/glm-5.2 · API_KEY = token de Cloudflare (solo en .env).
+  // MODEL = @cf/zai-org/glm-4.7-flash · API_KEY = token de Cloudflare (solo en .env).
   ASSISTANT_BASE_URL: Joi.string().allow('').default(''),
   ASSISTANT_API_KEY: Joi.string().allow('').default(''),
   ASSISTANT_MODEL: Joi.string().default('@cf/zai-org/glm-4.7-flash'),
