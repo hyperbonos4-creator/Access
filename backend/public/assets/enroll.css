@@ -29,7 +29,15 @@
 }
 @media (max-width: 880px) {
   .enroll-shell { grid-template-columns: 1fr; }
+  /* En móvil las tarjetas se apilan bajo la cámara. Prioriza la acción para que
+     el usuario no se pierda: el botón "Iniciar" queda justo bajo la cámara y, al
+     terminar, el resultado + botón del kiosko sube arriba (order más bajo). */
+  #control-card { order: 1; }
+  #liveness-card { order: 2; }
+  #result-card { order: 0; }
 }
+/* Al hacer scroll al resultado, deja aire para el header/banner fijo del demo. */
+#result-card { scroll-margin-top: 76px; }
 
 /* ── Escenario de cámara ─────────────────────────────────────────────────── */
 .stage {

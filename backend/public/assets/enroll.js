@@ -568,6 +568,7 @@ function showSuccess(res) {
   $('btn-retry').classList.remove('hidden');
   $('btn-retry').textContent = 'Registrar otra captura';
   toast('Rostro enrolado correctamente', 'ok');
+  revealResult();
 }
 
 function showFailure(res) {
@@ -586,6 +587,7 @@ function showFailure(res) {
   $('btn-start').classList.add('hidden');
   $('btn-retry').classList.remove('hidden');
   $('btn-retry').textContent = 'Reintentar';
+  revealResult();
 }
 
 function showScore(passive) {
@@ -627,12 +629,32 @@ function fail(message) {
   setFaceFlag('Detenido', 'bad');
   $('btn-retry').classList.remove('hidden');
   $('btn-start').classList.add('hidden');
+  revealResult();
 }
 
 function stopSource() {
   if (state.stream) { state.stream.getTracks().forEach((t) => t.stop()); state.stream = null; }
   const img = $('ipview');
   if (img.src) img.removeAttribute('src');
+}
+
+/* Lleva el resultado a la vista al terminar. En móvil el panel queda bajo la
+   cámara, así que el usuario "se embolata": esto sube el resultado + botón del
+   kiosko al tope visible para que no tenga que buscarlo. */
+function revealResult() {
+  const card = $('result-card');
+  if (!card) return;
+  // Doble rAF: espera a que el navegador aplique el layout (quitar .hidden) antes
+  // de calcular la posición de scroll.
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      try {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+    }),
+  );
 }
 
 /* ── UI helpers ─────────────────────────────────────────────────────────── */
