@@ -83,7 +83,7 @@ export const envValidationSchema = Joi.object({
   ASSISTANT_BASE_URL: Joi.string().allow('').default(''),
   ASSISTANT_API_KEY: Joi.string().allow('').default(''),
   ASSISTANT_MODEL: Joi.string().default('@cf/zai-org/glm-4.7-flash'),
-  ASSISTANT_MAX_TOKENS: Joi.number().default(700),
+  ASSISTANT_MAX_TOKENS: Joi.number().default(1000),
   ASSISTANT_TEMPERATURE: Joi.number().default(0.4),
   ASSISTANT_TIMEOUT_MS: Joi.number().default(22000),
   ASSISTANT_DISABLE_THINKING: Joi.string().valid('true', 'false').default('true'),

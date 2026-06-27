@@ -546,22 +546,24 @@ async function finishAndSubmit() {
 
 function showSuccess(res) {
   successChime();
-  speak('Registro exitoso. Ahora puedes probarlo en el kiosko.');
+  speak('Registro exitoso. Ahora puedes probarlo en la puerta.');
   setCue('✅', 'Registro completado', 'Rostro enrolado con prueba de vida verificada');
   $('result-card').classList.remove('hidden');
   $('result').className = 'result ok';
   $('result-title').textContent = '✔ Registro facial exitoso';
-  $('result-detail').textContent = '¡Tu rostro quedó registrado! Ahora pruébalo en el kiosko de la puerta.';
+  $('result-detail').textContent = '¡Tu rostro quedó registrado! Ahora pruébalo en la puerta de la derecha.';
   showScore(res.passiveScore);
   const acts = $('result-actions');
   if (acts) {
+    // Enlace con auto-login a la MISMA sesión (mismo token): así la puerta de
+    // prueba reconoce el rostro recién enrolado sin teclear credenciales ni caer
+    // en otra cuenta. El kiosko autoselecciona el único punto de la sesión.
+    const kioskHash = state.token ? '#t=' + encodeURIComponent(state.token) : '';
     acts.innerHTML =
-      '<div class="next-steps"><b>Para probar el reconocimiento:</b>' +
-      '<ol><li>Abre el <b>Kiosko de puerta</b> (botón de abajo).</li>' +
-      '<li>Inicia sesión con las credenciales de demostración.</li>' +
+      '<div class="next-steps"><b>¡Listo! Ahora pruébalo:</b>' +
+      '<ol><li>Pulsa el botón de abajo para abrir la <b>puerta de prueba</b>.</li>' +
       '<li>Acércate a la cámara: el sistema te reconocerá y abrirá la puerta.</li></ol>' +
-      '<div class="creds-mini">Usuario: <code>demo@visionyx.lat</code><br>Clave: <code>VisionyxDemo2026!</code></div>' +
-      '<a class="btn big-btn" href="/kiosk/" target="_blank" rel="noopener" style="margin-top:12px">🚪 Abrir kiosko para probar →</a></div>';
+      '<a class="btn big-btn" href="/kiosk/' + kioskHash + '" target="_blank" rel="noopener" style="margin-top:12px">🚪 Probar el reconocimiento en la puerta →</a></div>';
     acts.classList.remove('hidden');
   }
   $('btn-start').classList.add('hidden');

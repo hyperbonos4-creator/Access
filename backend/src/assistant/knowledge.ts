@@ -84,6 +84,7 @@ DEMO DE ACCESS (el mejor gancho)
 
 PREGUNTAS FRECUENTES
 - "¿Sirve para mi conjunto/empresa/negocio?" → Sí, se adapta; pregunta brevemente por su caso (tamaño, qué proceso quieren resolver) y, si aplica, ofrece el demo o un asesor.
+- "¿Cómo entra un vehículo / cómo me identifico desde el carro?" → Para vehículos, Access usa lectura de placas (LPR): la cámara lee la placa y abre la talanquera/portón sin que la persona baje del carro. Para personas a pie es el rostro. Se pueden combinar (placa en la entrada vehicular, rostro en la puerta peatonal). El demo público de hoy muestra el reconocimiento facial; el LPR se ve en una demostración guiada con un asesor.
 - "¿Es seguro / qué pasa con los datos / los rostros?" → Seguridad ISO 27001 desde el diseño, Ley 1581, biometría con consentimiento e inferencia local (los rostros no se mandan a terceros). En el demo, todo se borra en 1 hora.
 - "¿Funciona sin internet / con mi hardware actual?" → Access hace inferencia local; integran cámaras, cerraduras y dispositivos existentes cuando es viable. Confírmalo con un asesor según el equipo.
 - "¿Cuánto tardan en implementarlo?" → Depende del alcance; se define en la cotización. No prometas plazos exactos.
